@@ -10,7 +10,7 @@ async function getPrisma() {
     try {
       const mod = await import("@/lib/prisma");
       return (mod as any).prisma ?? (mod as any).default ?? null;
-    } catch (err) {
+    } catch (_err) {
       throw new Error(
         "No se pudo importar prisma desde '@/lib/prisma' ni '../../lib/prisma'. Revisa lib/prisma.ts"
       );

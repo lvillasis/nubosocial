@@ -13,7 +13,7 @@ export default function SearchBar() {
     try {
       const res = await axios.get(`/api/search?q=${encodeURIComponent(query)}`);
       setResults(res.data);
-    } catch (err) {
+    } catch (_err) {
       console.error(err);
     }
   };

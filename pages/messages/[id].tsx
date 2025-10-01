@@ -19,7 +19,7 @@ export default function ConversationPage() {
     (async () => {
       try {
         await fetch(`/api/conversations/${encodeURIComponent(convId)}/read`, { method: "POST" });
-      } catch (err) {
+      } catch (_err) {
         // ignore, endpoint may not exist — don't break page
         // console.debug("mark read failed", err);
       }

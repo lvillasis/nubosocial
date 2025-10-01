@@ -51,7 +51,7 @@ export default function FollowingPage({ profileUser, users, total, page, totalPa
       const json = await res.json();
       setList(json.following ?? []);
       setCurPage(json.page ?? p);
-    } catch (err) {
+    } catch (_err) {
       console.error("Error cargando following:", err);
     }
   };
@@ -74,7 +74,7 @@ export default function FollowingPage({ profileUser, users, total, page, totalPa
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || "Error");
       setFollowMap((m) => ({ ...m, [targetId]: Boolean(json.followed) }));
-    } catch (err) {
+    } catch (_err) {
       console.error("Follow error:", err);
       setFollowMap((m) => ({ ...m, [targetId]: currently }));
       alert("No se pudo actualizar el seguimiento. Intenta de nuevo.");

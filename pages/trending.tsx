@@ -23,7 +23,7 @@ export default function TrendingPage() {
       if (!res.ok) throw new Error("No trends");
       const json = await res.json();
       setTrends(Array.isArray(json) ? json : []);
-    } catch (err) {
+    } catch (_err) {
       console.error("Error loading trends:", err);
       setTrends([]);
     } finally {
@@ -34,7 +34,7 @@ export default function TrendingPage() {
 
   useEffect(() => {
     fetchTrends();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const filtered = useMemo(() => {

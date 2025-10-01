@@ -83,7 +83,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchPosts({ showLoader: true }); // 👈 Solo mostramos loader la 1ª vez
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const toggleComments = (postId: string) => {
@@ -122,7 +122,7 @@ export default function Home() {
       });
 
       setPosts(normalized);
-    } catch (err) {
+    } catch (_err) {
       console.error("fetchPosts error:", err);
       setError("No se pudieron cargar los posts.");
     } finally {
@@ -186,7 +186,7 @@ export default function Home() {
         // fallback: trigger animation
         triggerLikeExplosion(postId);
       }
-    } catch (err) {
+    } catch (_err) {
       // revertir en error de red
       setPosts((prev) =>
         prev.map((post) =>
@@ -233,7 +233,7 @@ export default function Home() {
       }
 
       setPosts((prev) => prev.filter((post) => post.id !== postId));
-    } catch (err) {
+    } catch (_err) {
       console.error("❌ Error en handleDelete:", err);
       alert("Error al eliminar el post");
     }

@@ -38,7 +38,7 @@ export default function FollowTrendChart({
         const json = await res.json();
         if (!mounted) return;
         setData(json.days || []);
-      } catch (err) {
+      } catch (_err) {
         console.error("Error loading follow trends:", err);
         setData([]);
       } finally {

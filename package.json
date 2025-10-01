@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "next lint",
     "dev:socket": "node server-socket.js"
-    
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -63,8 +62,8 @@
     "@tailwindcss/postcss": "^4.1.10",
     "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^20",
-    "@types/react": "^19",
+    "@types/node": "^20.19.19",
+    "@types/react": "^19.1.16",
     "@types/react-dom": "^19",
     "@types/sanitize-html": "^2.16.0",
     "autoprefixer": "^10.4.21",

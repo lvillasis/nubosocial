@@ -35,7 +35,7 @@ export default function ResetPasswordPage() {
       } else {
         setMsg(json?.error || "Error al restablecer contraseña");
       }
-    } catch (err) {
+    } catch (_err) {
       console.error(err);
       setMsg("Error del servidor");
     } finally {

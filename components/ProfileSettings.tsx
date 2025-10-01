@@ -111,7 +111,7 @@ export default function ProfileSettings() {
             image: initialImage,
             cover: initialCover || "",
         };
-        } catch (err) {
+        } catch (_err) {
         console.error("Error cargando configuración", err);
         setStatusMsg({ text: "Error cargando configuración", type: "error" });
         } finally {

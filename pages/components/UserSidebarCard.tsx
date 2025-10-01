@@ -30,7 +30,7 @@ export default function UserSidebarCard({ user }: Props) {
           setFollowers(data.followersCount);
           setFollowing(data.followingCount);
         }
-      } catch (err) {
+      } catch (_err) {
         console.error("Error cargando followersCount:", err);
       }
     }

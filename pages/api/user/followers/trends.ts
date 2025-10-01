@@ -95,7 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     return res.status(200).json({ labels, follows, unfollows, net });
-  } catch (err) {
+  } catch (_err) {
     console.error("followers/trends error:", err);
     return res.status(500).json({ error: "Error interno" });
   }

@@ -109,7 +109,7 @@ export const authOptions: NextAuthOptions = {
             token.emailNotifications = dbUser.emailNotifications ?? token.emailNotifications ?? true;
             token.darkMode = dbUser.darkMode ?? token.darkMode ?? false;
           }
-        } catch (err) {
+        } catch (_err) {
           console.warn("authOptions.jwt dbUser lookup failed:", err);
         }
       }

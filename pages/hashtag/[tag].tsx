@@ -31,7 +31,7 @@ function extractHashtagsFromText(text?: string): string[] {
   const regex = /#([^\s#.,!?;:()[\]{}"“”'`<>]+)/g;
   const set = new Set<string>();
   let m;
-  // eslint-disable-next-line no-cond-assign
+   
   while ((m = regex.exec(text)) !== null) {
     const tag = String(m[1] || "").replace(/^#/, "").trim();
     if (tag) set.add(tag);
@@ -115,7 +115,7 @@ export default function HashtagPage({
       if (typeof data.following === "boolean") {
         setFollowing(!!data.following);
       }
-    } catch (err) {
+    } catch (_err) {
       console.error("toggleFollow error:", err);
       setErrorMsg("Error de red al seguir/desseguir");
       setFollowing(prev);
@@ -177,7 +177,7 @@ export default function HashtagPage({
         if (typeof data.liked === "boolean") {
           setLikedMap((s) => ({ ...s, [postId]: !!data.liked }));
         }
-      } catch (err) {
+      } catch (_err) {
         console.error("Error al dar like:", err);
         setErrorMsg("Error de red al dar like");
         setLikedMap((s) => ({ ...s, [postId]: currentlyLiked }));
@@ -211,7 +211,7 @@ export default function HashtagPage({
         const data = await res.json();
         const list: CommentType[] = Array.isArray(data) ? data : Array.isArray(data.comments) ? data.comments : [];
         setComments((c) => ({ ...c, [postId]: list }));
-      } catch (err) {
+      } catch (_err) {
         console.error("Error cargando comentarios:", err);
         setErrorMsg("Error de red al cargar comentarios");
         setComments((c) => ({ ...c, [postId]: null }));
@@ -313,7 +313,7 @@ export default function HashtagPage({
 
       setComments((c) => ({ ...(c || {}), [postId]: (c[postId] || []).filter((cm: any) => cm.id !== tempId) }));
       setPostsState((prev) => prev.map((p) => (p.id === postId ? { ...p, commentsCount: Math.max(0, p.commentsCount - 1) } : p)));
-    } catch (err) {
+    } catch (_err) {
       console.error("Error publicando comentario:", err);
       setErrorMsg("Error de red al publicar comentario");
       setPostsState((prev) => prev.map((p) => (p.id === postId ? { ...p, commentsCount: Math.max(0, p.commentsCount - 1) } : p)));

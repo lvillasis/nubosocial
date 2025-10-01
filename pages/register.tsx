@@ -64,7 +64,7 @@ export default function RegisterPage() {
     }, 400);
 
     return () => clearTimeout(delayDebounce);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [username]);
 
   const checkUsernameAvailability = async (usernameToCheck: string) => {
@@ -73,7 +73,7 @@ export default function RegisterPage() {
       const data = await res.json();
       // If backend returns something unexpected, treat as unavailable-safe
       setUsernameAvailable(Boolean(data?.available));
-    } catch (err) {
+    } catch (_err) {
       setUsernameAvailable(null);
     } finally {
       setIsCheckingUsername(false);

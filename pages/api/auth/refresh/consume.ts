@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Si usas NextAuth con JWT/session, puedes devolver ok y el cliente pedirá /api/auth/session.
 
     return res.status(200).json({ ok: true });
-  } catch (err) {
+  } catch (_err) {
     console.error("consume refresh error:", err);
     return res.status(500).json({ error: "Server error" });
   }

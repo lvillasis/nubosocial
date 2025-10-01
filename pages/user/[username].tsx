@@ -94,7 +94,7 @@ export default function PublicProfile({
       // success: set state according to server truth
       setIsFollowing(Boolean(json.followed));
       if (typeof json.followersCount === "number") setFollowersCount(Number(json.followersCount));
-    } catch (err) {
+    } catch (_err) {
       console.error("Follow client error:", err);
       // rollback
       setIsFollowing(prevFollowing);
