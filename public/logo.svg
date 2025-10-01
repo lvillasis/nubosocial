@@ -1,0 +1,5 @@
+<!-- public/logo.svg -->
+<svg width="180" height="50" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <rect x="1" y="1" width="198" height="58" rx="10" fill="#3B82F6" stroke="#2563EB" stroke-width="2"/>
+  <text x="100" y="38" font-size="26" font-family="Arial, sans-serif" font-weight="bold" fill="white" text-anchor="middle">NUBO</text>
+</svg>

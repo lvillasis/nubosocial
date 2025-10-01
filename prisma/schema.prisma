@@ -1,0 +1,314 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String
+  role          Role      @default(USER)
+  username      String    @unique
+  coverImage    String?
+  bio           String?
+  location      String?
+  isActive      Boolean   @default(true)
+
+  // Preferencias del usuario aquí
+  darkMode           Boolean @default(false)
+  language           String  @default("es")
+  emailNotifications Boolean @default(true)
+
+  accounts          Account[]
+  comments          Comment[]  @relation("UserComments")
+  likes             Like[]     @relation("UserLikes")
+  posts             Post[]     @relation("UserPosts")
+  sessions          Session[]
+  givenProfileLikes UserLike[] @relation("GivenProfileLikes")
+  profileLikes      UserLike[] @relation("ProfileLikes")
+
+  // relación inversa para HashtagFollow
+  hashtagFollows HashtagFollow[]
+
+  // relación inversa para FeedItem
+  feedItems FeedItem[]
+
+  // notificaciones recibidas (destinatario)
+  notifications Notification[] @relation("NotificationsReceived")
+
+  // notificaciones enviadas/creadas por este usuario (actor)
+  sentNotifications Notification[] @relation("NotificationsSent")
+
+  // relaciones añadidas para mensajes / conversaciones
+  conversationParticipants ConversationParticipant[]
+  sentMessages             Message[]
+  messageReads             MessageRead[]
+
+  // Relación inversa para RefreshToken (añadida)
+  refreshTokens RefreshToken[] @relation("UserRefreshTokens")
+
+  // Relación inversa para PasswordResetToken (añadida)
+  passwordResetTokens PasswordResetToken[] @relation("UserPasswordResetTokens")
+
+  @@map("users")
+}
+
+
+model Post {
+  id        String     @id @default(cuid())
+  content   String
+  createdAt DateTime   @default(now())
+  authorId  String
+  image     String?
+  hashtags  String[]
+  mentions  String[]
+  comments  Comment[]  @relation("PostComments")
+  likes     Like[]     @relation("PostLikes")
+  author    User       @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  FeedItem  FeedItem[]
+
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  postId    String
+  authorId  String
+  author    User     @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+  post      Post     @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation("PostLikes", fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserLikes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("likes")
+}
+
+model UserLike {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  likedById String
+  likedBy   User     @relation("GivenProfileLikes", fields: [likedById], references: [id], onDelete: Cascade)
+  user      User     @relation("ProfileLikes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, likedById])
+  @@index([likedById], map: "idx_user_likes_likedbyid")
+  @@index([userId, createdAt], map: "idx_user_likes_userid_createdat")
+  @@map("user_likes")
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  MENTION
+  REPLY
+  MESSAGE
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String // destinatario (quien recibe la notificación)
+  actorId   String // quien hizo la acción (por ejemplo, quien dio like)
+  type      NotificationType
+  postId    String? // opcional: relacionado a post
+  commentId String? // opcional: relacionado a comment
+  data      Json? // payload extra (p. ej. texto, snippet)
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // relaciones nombradas explícitamente para evitar ambigüedad
+  user  User @relation("NotificationsReceived", fields: [userId], references: [id], onDelete: Cascade)
+  actor User @relation("NotificationsSent", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt])
+  @@map("notifications")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model FollowEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  actorId   String
+  type      String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, createdAt], map: "idx_followevent_userid_createdat")
+  @@map("FollowEvent")
+}
+
+model HashtagFollow {
+  id        String   @id @default(cuid())
+  userId    String
+  tag       String
+  createdAt DateTime @default(now())
+
+  // relación al usuario
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tag])
+  @@index([tag])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation("UserRefreshTokens", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Conversation {
+  id           String                    @id @default(cuid())
+  title        String?
+  isGroup      Boolean                   @default(false)
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id                String   @id @default(cuid())
+  conversationId    String
+  userId            String
+  joinedAt          DateTime @default(now())
+  lastReadMessageId String?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String?
+  attachment     String? // url / clave en Cloudinary
+  createdAt      DateTime  @default(now())
+  editedAt       DateTime?
+  deleted        Boolean   @default(false)
+  replyToId      String?
+
+  conversation Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  replyTo      Message?      @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies      Message[]     @relation("MessageReplies")
+  reads        MessageRead[]
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+model MessageRead {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@map("message_reads")
+}
+
+model FeedItem {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([postId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user User @relation("UserPasswordResetTokens", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
