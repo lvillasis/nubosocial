@@ -124,7 +124,14 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
           if (String(msg.conversationId) !== String(conversationId)) return;
           setMessages((prev) => {
             if (prev.some((m) => m.id === msg.id)) return prev;
-            const idx = prev.findIndex((m) => m.pending && m.senderId === msg.senderId && m.content && msg.content && m.content.trim() === msg.content.trim());
+            const idx = prev.findIndex(
+              (m) =>
+                m.pending &&
+                m.senderId === msg.senderId &&
+                m.content &&
+                msg.content &&
+                m.content.trim() === msg.content.trim()
+            );
             if (idx >= 0) {
               const copy = [...prev];
               copy[idx] = msg;
@@ -134,7 +141,7 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
           });
         });
       } catch (_err) {
-        console.warn("Socket connect failed:", err);
+        console.warn("Socket connect failed:", _err);
       }
     }
     connect();
@@ -190,7 +197,7 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
         setMessages((prev) => prev.map((m) => (m.id === tempId ? saved : m)));
       }
     } catch (_err) {
-      console.error("REST send exception", err);
+      console.error("REST send exception", _err);
       setMessages((prev) => prev.map((m) => (m.id === tempId ? { ...m, failed: true, pending: false } : m)));
     }
   };
@@ -228,8 +235,8 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
           try {
             const res = JSON.parse(xhr.responseText);
             resolve(res.secure_url || res.url);
-          } catch (_err) {
-            reject(err);
+          } catch (parseErr) {
+            reject(parseErr);
           }
         } else {
           reject(new Error(`Upload failed ${xhr.status}`));
@@ -254,7 +261,7 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
       const url = await uploadToCloudinary(file);
       await sendMessage(null, url);
     } catch (_err) {
-      console.error("Upload error", err);
+      console.error("Upload error", _err);
       alert("No se pudo subir la imagen");
     }
   };
@@ -291,12 +298,12 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
               // use plain img to avoid next/image domain issues in dev
               <img src={other.image} alt={other.name ?? "Avatar"} className="w-full h-full object-cover" />
             ) : (
-              <span className="text-sm">{(other?.name || other?.username || "U").charAt(0)}</span>
+              <span className="text-sm">{(other?.name || (other as any)?.username || "U").charAt(0)}</span>
             )}
           </div>
 
           <div>
-            <div className="font-semibold">{other?.name ?? other?.username ?? "Chat"}</div>
+            <div className="font-semibold">{other?.name ?? (other as any)?.username ?? "Chat"}</div>
             <div className="text-xs text-gray-500">{connected ? "En línea" : "Conectando..."}</div>
           </div>
         </div>
