@@ -144,7 +144,7 @@ export default function RightSidebarDashboard() {
       setAuthorsCache((s) => ({ ...s, [key]: authors }));
       setDailyCache((s) => ({ ...s, [key]: daily.length ? daily : null }));
     } catch (_err) {
-      console.error("fetchPreviewAndAuthors error:", err);
+      console.error("fetchPreviewAndAuthors error:", _err);
       setPreviewCache((s) => ({ ...s, [key]: null }));
       setAuthorsCache((s) => ({ ...s, [key]: null }));
       setDailyCache((s) => ({ ...s, [key]: null }));
