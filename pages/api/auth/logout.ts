@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ]);
 
     return res.status(200).json({ message: "Sesión cerrada correctamente" });
-  } catch (err) {
+  } catch (_err) {
     console.error("Error en logout:", err);
     return res.status(500).json({ error: "Error cerrando sesión" });
   }

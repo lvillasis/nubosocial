@@ -62,7 +62,7 @@ export default function FollowersPage({ profileUser, users, total, page, totalPa
       const json = await res.json();
       setList(json.followers ?? []);
       setCurPage(json.page ?? p);
-    } catch (err) {
+    } catch (_err) {
       console.error("Error cargando seguidores:", err);
     }
   };
@@ -87,7 +87,7 @@ export default function FollowersPage({ profileUser, users, total, page, totalPa
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || "Error");
       setFollowMap((m) => ({ ...m, [targetId]: Boolean(json.followed) }));
-    } catch (err) {
+    } catch (_err) {
       console.error("Follow error:", err);
       // rollback
       setFollowMap((m) => ({ ...m, [targetId]: currently }));

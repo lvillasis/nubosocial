@@ -62,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     return res.status(200).json({ success: true, url: result.secure_url, user: updatedUser });
-  } catch (err) {
+  } catch (_err) {
     console.error("❌ Error en upload:", err);
     return res.status(500).json({ error: "Error al subir imagen" });
   }

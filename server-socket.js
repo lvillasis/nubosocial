@@ -20,7 +20,7 @@ io.use(async (socket, next) => {
     const payload = jwt.verify(token, process.env.JWT_SECRET || "dev-secret");
     socket.userId = payload.sub || payload.userId;
     return next();
-  } catch (err) {
+  } catch (_err) {
     return next(new Error("Invalid token"));
   }
 });
@@ -34,7 +34,7 @@ io.on("connection", async (socket) => {
     const parts = await prisma.conversationParticipant.findMany({ where: { userId } });
     parts.forEach(p => socket.join(`conversation:${p.conversationId}`));
     socket.join(`user:${userId}`);
-  } catch (err) {
+  } catch (_err) {
     console.error("Error joining rooms:", err);
   }
 
@@ -78,7 +78,7 @@ io.on("connection", async (socket) => {
         io.to(`user:${p.userId}`).emit("notification", notif);
       }
 
-    } catch (err) {
+    } catch (_err) {
       console.error("send_message error:", err);
       socket.emit("error", { message: "Could not send message" });
     }

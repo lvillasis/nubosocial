@@ -60,7 +60,7 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
           oth = p0.user ?? p0;
         }
         setOther(oth ?? null);
-      } catch (err) {
+      } catch (_err) {
         // ignore
       }
     })();
@@ -133,7 +133,7 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
             return [...prev, msg];
           });
         });
-      } catch (err) {
+      } catch (_err) {
         console.warn("Socket connect failed:", err);
       }
     }
@@ -189,7 +189,7 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
         const saved = await res.json();
         setMessages((prev) => prev.map((m) => (m.id === tempId ? saved : m)));
       }
-    } catch (err) {
+    } catch (_err) {
       console.error("REST send exception", err);
       setMessages((prev) => prev.map((m) => (m.id === tempId ? { ...m, failed: true, pending: false } : m)));
     }
@@ -228,7 +228,7 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
           try {
             const res = JSON.parse(xhr.responseText);
             resolve(res.secure_url || res.url);
-          } catch (err) {
+          } catch (_err) {
             reject(err);
           }
         } else {
@@ -253,7 +253,7 @@ export default function ChatWindow({ conversationId, currentUserId }: Props) {
     try {
       const url = await uploadToCloudinary(file);
       await sendMessage(null, url);
-    } catch (err) {
+    } catch (_err) {
       console.error("Upload error", err);
       alert("No se pudo subir la imagen");
     }

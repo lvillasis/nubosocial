@@ -81,7 +81,7 @@ export default function NewPostForm({ onPostCreated }: Props) {
             try {
               const parsed = JSON.parse(xhr.response);
               resolve(parsed);
-            } catch (err) {
+            } catch (_err) {
               reject(new Error("Respuesta inválida al subir imagen"));
             }
           } else {
@@ -96,7 +96,7 @@ export default function NewPostForm({ onPostCreated }: Props) {
       try {
         const uploadData = await uploadPromise;
         imageUrl = uploadData.secure_url;
-      } catch (err) {
+      } catch (_err) {
         console.error(err);
         setError("Error al subir imagen");
         return;
@@ -123,7 +123,7 @@ export default function NewPostForm({ onPostCreated }: Props) {
       setContent("");
       handleImageRemove();
       onPostCreated();
-    } catch (err) {
+    } catch (_err) {
       console.error("Error creando post:", err);
       setError("Error inesperado al crear el post");
     }

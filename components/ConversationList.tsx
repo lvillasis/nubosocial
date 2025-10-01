@@ -38,7 +38,7 @@ export default function ConversationList({
     const parts = Array.isArray(conv.participants) ? conv.participants : [];
 
     // 1) try shape: { user: { id, name, username, image } }
-    let other = parts.find((p: any) => {
+    const other = parts.find((p: any) => {
       const uid = p?.user?.id ?? p?.id ?? p?.userId ?? null;
       return uid && String(uid) !== String(currentUserId);
     });

@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     if (sessUser?.id) currentUser = await prisma.user.findUnique({ where: { id: String(sessUser.id) } });
     if (!currentUser && sessUser?.email) currentUser = await prisma.user.findUnique({ where: { email: String(sessUser.email) } });
-  } catch (err) {
+  } catch (_err) {
     console.error("User lookup error:", err);
     return res.status(500).json({ error: "DB error" });
   }
@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         include: { sender: { select: { id: true, name: true, username: true, image: true } } },
       });
       return res.status(200).json(messages);
-    } catch (err) {
+    } catch (_err) {
       console.error("GET messages error:", err);
       return res.status(500).json({ error: "Internal server error" });
     }
@@ -91,7 +91,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await prisma.conversation.update({ where: { id: conversationId }, data: { updatedAt: new Date() } });
 
       return res.status(201).json(message);
-    } catch (err) {
+    } catch (_err) {
       console.error("Create message error:", err);
       return res.status(500).json({ error: "Internal server error" });
     }

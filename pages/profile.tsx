@@ -177,7 +177,7 @@ export default function ProfilePage({ session, userInDb, followersCount: initial
         const json = await res.json();
         if (!mounted) return;
         if (typeof json.count === "number") setFollowersCount(json.count);
-      } catch (err) {
+      } catch (_err) {
         /* ignore */
       }
     };

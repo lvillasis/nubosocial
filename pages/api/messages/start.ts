@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     return res.status(201).json({ conversationId: created.id });
-  } catch (err) {
+  } catch (_err) {
     console.error("API /api/messages/start error:", err);
     return res.status(500).json({ error: "Internal server error" });
   }

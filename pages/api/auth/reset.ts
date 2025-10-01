@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await prisma.session.deleteMany({ where: { userId: row.userId } });
 
     return res.status(200).json({ ok: true });
-  } catch (err) {
+  } catch (_err) {
     console.error("reset error:", err);
     return res.status(500).json({ error: "Server error" });
   }

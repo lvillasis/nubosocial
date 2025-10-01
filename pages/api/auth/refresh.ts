@@ -61,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
 
     return res.status(200).json({ accessToken });
-  } catch (err) {
+  } catch (_err) {
     console.error("refresh error:", err);
     return res.status(500).json({ error: "Server error" });
   }

@@ -70,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         error: "Funcionalidad no disponible: tabla HashtagFollow no existe. Ejecuta `prisma db push` o aplica migraciones y regenera el cliente.",
       });
     }
-  } catch (err) {
+  } catch (_err) {
     console.error("Error comprobando modelo HashtagFollow:", err);
     return res.status(500).json({ error: "Error interno al comprobar la base de datos" });
   }

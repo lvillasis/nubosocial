@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
       setMsg("Si existe una cuenta con ese correo recibirás un email con instrucciones.");
       setEmail("");
       setTimeout(() => router.push("/login"), 4000);
-    } catch (err) {
+    } catch (_err) {
       console.error(err);
       setMsg("Ocurrió un error. Intenta de nuevo.");
     } finally {

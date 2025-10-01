@@ -126,7 +126,7 @@ export default function EditProfileModal({
             setPreviewCover(data.url);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         console.error("Error subiendo imagen:", err);
       }
     }

@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const following = rows.map((r) => r.user);
 
     // Si hay sesión, marcar si yo (meId) sigo a esos usuarios (para mostrar un botón "Dejar de seguir" / "Seguir")
-    let followedByMeSet = new Set<string>();
+    const followedByMeSet = new Set<string>();
     if (meId && following.length > 0) {
       const followingIds = following.map((f) => f.id);
       const myFollows = await prisma.userLike.findMany({
@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const hasNextPage = page < totalPages;
 
     return res.status(200).json({ total, page, perPage, totalPages, hasNextPage, following: result });
-  } catch (err) {
+  } catch (_err) {
     console.error("API /api/user/following error:", err);
     return res.status(500).json({ error: "Internal server error" });
   }

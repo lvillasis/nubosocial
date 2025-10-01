@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!user) return res.status(404).json({ success: false, message: "Usuario no encontrado" });
 
     return res.status(200).json({ success: true, user });
-  } catch (err) {
+  } catch (_err) {
     console.error("API /api/user/[username] error:", err);
     return res.status(500).json({ success: false, message: "DB error", error: String(err) });
   }

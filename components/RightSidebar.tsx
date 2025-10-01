@@ -115,7 +115,7 @@ export default function RightSidebar({ t, activeTag }: { t?: (s: string) => stri
                 .filter((x) => x.hashtag)
             : [];
         setTrends(parsed.length ? parsed : fallbackHashtags.map((h, i) => ({ hashtag: h.replace("#", ""), count: i === 0 ? 3 : 1 })));
-      } catch (err) {
+      } catch (_err) {
         setTrends(fallbackHashtags.map((h, i) => ({ hashtag: h.replace("#", ""), count: i === 0 ? 3 : 1 })));
       } finally {
         if (mounted) setLoading(false);
@@ -150,7 +150,7 @@ export default function RightSidebar({ t, activeTag }: { t?: (s: string) => stri
         createdAt: item.createdAt ?? item.created_at ?? undefined,
       };
       setPreviewCache((c) => ({ ...c, [key]: preview }));
-    } catch (err) {
+    } catch (_err) {
       setPreviewCache((c) => ({ ...c, [key]: null }));
     }
   };
