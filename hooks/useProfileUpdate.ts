@@ -88,7 +88,7 @@ export function useProfileUpdate() {
       const result = await updateProfile(payload);
       return result;
     } catch (_err) {
-      throw err;
+      throw _err;
     } finally {
       setLoading(false);
     }
