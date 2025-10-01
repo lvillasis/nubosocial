@@ -79,14 +79,14 @@ export default function ProfileSettings() {
 
   const bioMax = 160;
 
-    // load initial data from API / session
-    useEffect(() => {
+  // load initial data from API / session
+  useEffect(() => {
     const fetchData = async () => {
-        if (!session?.user?.email) {
+      if (!session?.user?.email) {
         setLoading(false);
         return;
-        }
-        try {
+      }
+      try {
         setLoading(true);
         const res = await fetch("/api/user/settings");
         if (!res.ok) throw new Error("Error al cargar usuario");
@@ -105,22 +105,22 @@ export default function ProfileSettings() {
         setCover(initialCover || null);
 
         initRef.current = {
-            name: initialName,
-            bio: initialBio,
-            location: initialLocation,
-            image: initialImage,
-            cover: initialCover || "",
+          name: initialName,
+          bio: initialBio,
+          location: initialLocation,
+          image: initialImage,
+          cover: initialCover || "",
         };
-        } catch (_err) {
-        console.error("Error cargando configuración", err);
+      } catch (_err) {
+        console.error("Error cargando configuración", _err);
         setStatusMsg({ text: "Error cargando configuración", type: "error" });
-        } finally {
+      } finally {
         setLoading(false);
-        }
+      }
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [session?.user?.email]);
+  }, [session?.user?.email]);
 
   const isDirty =
     name !== initRef.current.name ||
@@ -324,7 +324,7 @@ export default function ProfileSettings() {
   return (
     <>
       <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-[#0b0b12] rounded-2xl shadow-lg border border-gray-100 dark:border-gray-800">
-        {/* Header */}
+        {/* Header */} 
         <div className="flex items-start justify-between mb-6 gap-4">
           <div>
             <h2 className="text-xl md:text-2xl font-extrabold text-gray-800 dark:text-gray-100">Configuración de perfil</h2>
