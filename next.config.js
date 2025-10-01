@@ -1,11 +1,9 @@
-// next.config.js
 const { i18n } = require("./next-i18next.config");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   i18n,
   reactStrictMode: true,
-  // Evita que errores de eslint rompan el build en el entorno de deploy
   eslint: {
     ignoreDuringBuilds: true,
   },
