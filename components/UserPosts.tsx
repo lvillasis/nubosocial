@@ -74,7 +74,7 @@ export default function UserPosts({ userId }: { userId: string }) {
         const arr: Post[] = Array.isArray(json) ? json : json.posts ?? [];
         setPosts(arr);
       } catch (_err) {
-        console.error("UserPosts load error:", err);
+        console.error("UserPosts load error:", _err);
         setPosts([]);
       } finally {
         if (mounted) setLoading(false);
@@ -152,7 +152,7 @@ export default function UserPosts({ userId }: { userId: string }) {
         return next;
       });
     } catch (_err) {
-      console.error("like error", err);
+      console.error("like error", _err);
       // revert optimistic UI if error: toggle local set back and refetch post
       setLocalLikedSet((s) => {
         const next = { ...s };
