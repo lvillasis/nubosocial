@@ -26,7 +26,7 @@ export async function sendResetEmail(to: string, resetUrl: string) {
       const res = await sgMail.send(msg);
       return res;
     } catch (_err) {
-      console.error("SendGrid error:", err);
+      console.error("SendGrid error:", _err);
       // caemos a fallback abajo
     }
   }

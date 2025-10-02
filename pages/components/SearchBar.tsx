@@ -14,7 +14,7 @@ export default function SearchBar() {
       const res = await axios.get(`/api/search?q=${encodeURIComponent(query)}`);
       setResults(res.data);
     } catch (_err) {
-      console.error(err);
+      console.error(_err);
     }
   };
 

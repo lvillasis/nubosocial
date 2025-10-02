@@ -1,7 +1,7 @@
 // pages/api/auth/reset.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
-import { hashTokenSHA256, hashPassword } from "@/lib/auth";
+import { hashRefreshToken as hashTokenSHA256, hashPassword } from "@/lib/auth";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") return res.status(405).end();
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ ok: true });
   } catch (_err) {
-    console.error("reset error:", err);
+    console.error("reset error:", _err);
     return res.status(500).json({ error: "Server error" });
   }
 }

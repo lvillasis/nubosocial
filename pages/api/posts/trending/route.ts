@@ -39,7 +39,7 @@ export async function GET() {
       headers: { "Cache-Control": "s-maxage=60, stale-while-revalidate=300" },
     });
   } catch (_err) {
-    console.error("Error trending (route.ts):", err);
+    console.error("Error trending (route.ts):", _err);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

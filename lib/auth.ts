@@ -1,4 +1,3 @@
-// lib/auth.ts
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import prisma from "./prisma";
@@ -8,6 +7,11 @@ const REFRESH_TOKEN_HASH_ALGO = "sha256";
 /** Hash SHA256 hex para refresh tokens (almacenamos este hash en BD). */
 export function hashRefreshToken(token: string): string {
   return crypto.createHash(REFRESH_TOKEN_HASH_ALGO).update(token).digest("hex");
+}
+
+/** Hash SHA256 genérico (para reset tokens, email links, etc). */
+export function hashTokenSHA256(token: string): string {
+  return crypto.createHash("sha256").update(token).digest("hex");
 }
 
 /** Buscar registro de refresh token por el token "en claro". */

@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ followed: Boolean(found) });
   } catch (_err) {
-    console.error("API /api/user/isFollowing error:", err);
+    console.error("API /api/user/isFollowing error:", _err);
     return res.status(500).json({ error: "Error interno" });
   }
 }

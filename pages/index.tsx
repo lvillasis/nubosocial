@@ -123,7 +123,7 @@ export default function Home() {
 
       setPosts(normalized);
     } catch (_err) {
-      console.error("fetchPosts error:", err);
+      console.error("fetchPosts error:", _err);
       setError("No se pudieron cargar los posts.");
     } finally {
       if (showLoader) setInitialLoading(false);
@@ -200,7 +200,7 @@ export default function Home() {
             : post
         )
       );
-      console.error("Error al enviar like:", err);
+      console.error("Error al enviar like:", _err);
     }
   };
 
@@ -234,7 +234,7 @@ export default function Home() {
 
       setPosts((prev) => prev.filter((post) => post.id !== postId));
     } catch (_err) {
-      console.error("❌ Error en handleDelete:", err);
+      console.error("❌ Error en handleDelete:", _err);
       alert("Error al eliminar el post");
     }
   };

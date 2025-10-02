@@ -32,7 +32,7 @@ if (UPSTASH_URL && UPSTASH_TOKEN) {
   try {
     redisClient = new Redis({ url: UPSTASH_URL, token: UPSTASH_TOKEN });
   } catch (_err) {
-    console.warn("Upstash Redis init failed:", err);
+    console.warn("Upstash Redis init failed:", _err);
     redisClient = null;
   }
 }
@@ -49,7 +49,7 @@ if (redisClient) {
         limiter: (Ratelimit as any).slidingWindow(limit, duration),
       });
     } catch (_err) {
-      console.warn("Failed to create Upstash limiter for", p, err);
+      console.warn("Failed to create Upstash limiter for", p, _err);
       upstashLimiters[p] = null;
     }
   }
@@ -98,7 +98,7 @@ export async function checkRateLimitFor(policy: PolicyName, key: string) {
         meta: res,
       };
     } catch (_err) {
-      console.error("Upstash limiter error (falling back to memory):", err);
+      console.error("Upstash limiter error (falling back to memory):", _err);
       return checkMemoryLimit(k, policy);
     }
   } else {

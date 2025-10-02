@@ -1,13 +1,18 @@
 // pages/api/auth/refresh.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import cookie from "cookie";
-import jwt from "jsonwebtoken";
+import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import { randomBytes } from "crypto";
 import prisma from "@/lib/prisma";
-import { hashRefreshToken, findRefreshTokenRecordByToken, markRefreshTokenUsed } from "@/lib/auth";
+import {
+  hashRefreshToken,
+  findRefreshTokenRecordByToken,
+  markRefreshTokenUsed,
+} from "@/lib/auth";
 
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
-const ACCESS_TOKEN_EXP = process.env.ACCESS_TOKEN_EXP || "15m";
+// Tipar las constantes de entorno
+const ACCESS_TOKEN_SECRET: Secret = process.env.ACCESS_TOKEN_SECRET as string;
+const ACCESS_TOKEN_EXP: string | number = process.env.ACCESS_TOKEN_EXP || "15m";
 const REFRESH_TOKEN_BYTES = 48;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -31,9 +36,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await markRefreshTokenUsed(record.id);
 
     // Nuevo access token
-    const accessToken = jwt.sign({ sub: user.id, email: user.email }, ACCESS_TOKEN_SECRET, {
-      expiresIn: ACCESS_TOKEN_EXP,
-    });
+    const accessToken = jwt.sign(
+      { sub: user.id, email: user.email },
+      ACCESS_TOKEN_SECRET,
+      { expiresIn: ACCESS_TOKEN_EXP } as SignOptions
+    );
 
     // Rotación: crear nuevo refresh token
     const newRefreshToken = randomBytes(REFRESH_TOKEN_BYTES).toString("hex");
@@ -56,13 +63,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: 30 * 24 * 3600,
+        maxAge: 30 * 24 * 3600, // segundos
       })
     );
 
     return res.status(200).json({ accessToken });
   } catch (_err) {
-    console.error("refresh error:", err);
+    console.error("refresh error:", _err);
     return res.status(500).json({ error: "Server error" });
   }
 }

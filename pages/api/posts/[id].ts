@@ -115,7 +115,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           try {
             await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
           } catch (_err) {
-            console.warn("Cloudinary destroy error (se continúa):", err);
+            console.warn("Cloudinary destroy error (se continúa):", _err);
           }
         }
       }

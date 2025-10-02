@@ -28,7 +28,7 @@ export default function Navbar() {
       await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
       await signOut({ callbackUrl: "/login" });
     } catch (_err) {
-      console.error("Error cerrando sesión:", err);
+      console.error("Error cerrando sesión:", _err);
     }
   };
 

@@ -55,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.setHeader("Set-Cookie", serialized);
     return res.status(200).json({ ok: true });
   } catch (_err) {
-    console.error("error creating refresh token:", err);
+    console.error("error creating refresh token:", _err);
     return res.status(500).json({ error: "Server error" });
   }
 }

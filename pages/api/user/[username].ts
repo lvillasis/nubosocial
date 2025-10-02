@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ success: true, user });
   } catch (_err) {
-    console.error("API /api/user/[username] error:", err);
-    return res.status(500).json({ success: false, message: "DB error", error: String(err) });
+    console.error("API /api/user/[username] error:", _err);
+    return res.status(500).json({ success: false, message: "DB error", error: String(_err) });
   }
 }

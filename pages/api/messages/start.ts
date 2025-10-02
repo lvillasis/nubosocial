@@ -51,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(201).json({ conversationId: created.id });
   } catch (_err) {
-    console.error("API /api/messages/start error:", err);
+    console.error("API /api/messages/start error:", _err);
     return res.status(500).json({ error: "Internal server error" });
   }
 }

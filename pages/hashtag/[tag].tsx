@@ -116,7 +116,7 @@ export default function HashtagPage({
         setFollowing(!!data.following);
       }
     } catch (_err) {
-      console.error("toggleFollow error:", err);
+      console.error("toggleFollow error:", _err);
       setErrorMsg("Error de red al seguir/desseguir");
       setFollowing(prev);
     } finally {
@@ -178,7 +178,7 @@ export default function HashtagPage({
           setLikedMap((s) => ({ ...s, [postId]: !!data.liked }));
         }
       } catch (_err) {
-        console.error("Error al dar like:", err);
+        console.error("Error al dar like:", _err);
         setErrorMsg("Error de red al dar like");
         setLikedMap((s) => ({ ...s, [postId]: currentlyLiked }));
         setPostsState((prev) => prev.map((p) => (p.id === postId ? { ...p, likesCount: prevCount } : p)));
@@ -212,7 +212,7 @@ export default function HashtagPage({
         const list: CommentType[] = Array.isArray(data) ? data : Array.isArray(data.comments) ? data.comments : [];
         setComments((c) => ({ ...c, [postId]: list }));
       } catch (_err) {
-        console.error("Error cargando comentarios:", err);
+        console.error("Error cargando comentarios:", _err);
         setErrorMsg("Error de red al cargar comentarios");
         setComments((c) => ({ ...c, [postId]: null }));
       } finally {
@@ -314,7 +314,7 @@ export default function HashtagPage({
       setComments((c) => ({ ...(c || {}), [postId]: (c[postId] || []).filter((cm: any) => cm.id !== tempId) }));
       setPostsState((prev) => prev.map((p) => (p.id === postId ? { ...p, commentsCount: Math.max(0, p.commentsCount - 1) } : p)));
     } catch (_err) {
-      console.error("Error publicando comentario:", err);
+      console.error("Error publicando comentario:", _err);
       setErrorMsg("Error de red al publicar comentario");
       setPostsState((prev) => prev.map((p) => (p.id === postId ? { ...p, commentsCount: Math.max(0, p.commentsCount - 1) } : p)));
       setComments((c) => ({ ...(c || {}), [postId]: (c[postId] || []).filter((cm: any) => cm.id !== tempId) }));

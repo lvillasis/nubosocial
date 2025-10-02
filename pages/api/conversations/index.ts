@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (sessUser?.id) user = await prisma.user.findUnique({ where: { id: String(sessUser.id) } });
     if (!user && sessUser?.email) user = await prisma.user.findUnique({ where: { email: String(sessUser.email) } });
   } catch (_err) {
-    console.error("User lookup error:", err);
+    console.error("User lookup error:", _err);
     return res.status(500).json({ error: "DB error" });
   }
   if (!user) return res.status(401).json({ error: "User not found" });

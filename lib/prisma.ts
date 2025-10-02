@@ -46,8 +46,8 @@ try {
 
             try {
               removeExiste(params.args.where);
-            } catch (_err) {
-              console.warn("[prisma.middleware] fallo al limpiar where:", err);
+            } catch (_err) {  
+              console.warn("[prisma.middleware] fallo al limpiar where:", _err);
             }
           }
         }

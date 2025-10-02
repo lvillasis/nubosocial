@@ -71,7 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       });
     }
   } catch (_err) {
-    console.error("Error comprobando modelo HashtagFollow:", err);
+    console.error("Error comprobando modelo HashtagFollow:", _err);
     return res.status(500).json({ error: "Error interno al comprobar la base de datos" });
   }
 

@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       return res.status(200).json(user);
     } catch (_err) {
-      console.error("❌ Error cargando usuario:", err);
+      console.error("❌ Error cargando usuario:", _err);
       return res.status(500).json({ message: "Error al cargar usuario" });
     }
   }

@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { randomBytes } from "crypto";
 import prisma from "@/lib/prisma";
-import { hashTokenSHA256 } from "@/lib/auth";
+import { hashRefreshToken as hashTokenSHA256 } from "@/lib/auth"; 
 import { sendResetEmail } from "@/lib/mail";
 
 const RESET_EXPIRES_MS = 60 * 60 * 1000; // 1h
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json(genericOk);
   } catch (_err) {
-    console.error("forgot error:", err);
+    console.error("forgot error:", _err);
     return res.status(500).json({ error: "Server error" });
   }
 }

@@ -39,7 +39,8 @@ export default function FollowTrendChart({
         if (!mounted) return;
         setData(json.days || []);
       } catch (_err) {
-        console.error("Error loading follow trends:", err);
+        // usamos _err porque el catch declara _err
+        console.error("Error loading follow trends:", _err);
         setData([]);
       } finally {
         if (mounted) setLoading(false);

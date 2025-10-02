@@ -24,7 +24,7 @@ export default function TrendingPage() {
       const json = await res.json();
       setTrends(Array.isArray(json) ? json : []);
     } catch (_err) {
-      console.error("Error loading trends:", err);
+      console.error("Error loading trends:", _err);
       setTrends([]);
     } finally {
       setLoading(false);

@@ -63,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json(newComment);
   } catch (_err) {
-    console.error("❌ Error al guardar comentario:", err);
+    console.error("❌ Error al guardar comentario:", _err);
     return res.status(500).json({ error: "Error al guardar comentario" });
   }
 }

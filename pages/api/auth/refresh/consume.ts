@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ ok: true });
   } catch (_err) {
-    console.error("consume refresh error:", err);
+    console.error("consume refresh error:", _err);
     return res.status(500).json({ error: "Server error" });
   }
 }

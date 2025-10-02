@@ -97,7 +97,7 @@ export default function NewPostForm({ onPostCreated }: Props) {
         const uploadData = await uploadPromise;
         imageUrl = uploadData.secure_url;
       } catch (_err) {
-        console.error(err);
+        console.error(_err);
         setError("Error al subir imagen");
         return;
       } finally {
@@ -124,7 +124,7 @@ export default function NewPostForm({ onPostCreated }: Props) {
       handleImageRemove();
       onPostCreated();
     } catch (_err) {
-      console.error("Error creando post:", err);
+      console.error("Error creando post:", _err);
       setError("Error inesperado al crear el post");
     }
   };

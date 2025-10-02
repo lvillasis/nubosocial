@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
     return res.status(200).json(trends);
   } catch (_err) {
-    console.error("Error /api/posts/trendingAll:", err);
+    console.error("Error /api/posts/trendingAll:", _err);
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 }

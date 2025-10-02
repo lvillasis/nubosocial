@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ total, page, perPage, totalPages, hasNextPage, followers: result });
   } catch (_err) {
-    console.error("API /api/user/followers error:", err);
+    console.error("API /api/user/followers error:", _err);
     return res.status(500).json({ error: "Internal server error" });
   }
 }

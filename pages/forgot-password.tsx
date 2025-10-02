@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
       setEmail("");
       setTimeout(() => router.push("/login"), 4000);
     } catch (_err) {
-      console.error(err);
+      console.error(_err);
       setMsg("Ocurrió un error. Intenta de nuevo.");
     } finally {
       setLoading(false);

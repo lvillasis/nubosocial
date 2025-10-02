@@ -112,7 +112,7 @@ export default function MessagesIndexPage() {
       const normalized = normalizeConversations(convs, meId);
       setConversations(normalized);
     } catch (_err) {
-      console.error("Error fetching conversations:", err);
+      console.error("Error fetching conversations:", _err);
       setConversations([]);
     } finally {
       setLoading(false);
@@ -150,7 +150,7 @@ export default function MessagesIndexPage() {
           setSearchResults(Array.isArray(data) ? data : []);
         }
       } catch (_err) {
-        console.error("Search error", err);
+        console.error("Search error", _err);
         if (!mounted) return;
         setSearchResults([]);
       } finally {
@@ -215,7 +215,7 @@ export default function MessagesIndexPage() {
       else router.push("/messages/new");
       setComposeOpen(false);
     } catch (_err) {
-      console.error("create conversation error:", err);
+      console.error("create conversation error:", _err);
       if (username) router.push(`/messages/new?to=${encodeURIComponent(username)}`);
       else router.push("/messages/new");
       setComposeOpen(false);
@@ -268,7 +268,7 @@ export default function MessagesIndexPage() {
           }, 3000);
         });
       } catch (_err) {
-        console.warn("Socket connect failed:", err);
+        console.warn("Socket connect failed:", _err);
       }
     }
 
@@ -334,7 +334,7 @@ export default function MessagesIndexPage() {
       setDeleting(false);
       setDeleteTargetId(null);
     } catch (_err) {
-      console.error("Delete request error:", err);
+      console.error("Delete request error:", _err);
       alert("Error de red al intentar eliminar la conversación.");
       setDeleting(false);
       setDeleteTargetId(null);
@@ -526,7 +526,7 @@ function ComposeModal({ onClose, onSelectUser }: { onClose: () => void; onSelect
           setResults(Array.isArray(data) ? data.filter((d: any) => d.type === "user") : []);
         }
       } catch (_err) {
-        console.error("compose search error", err);
+        console.error("compose search error", _err);
         if (!mounted) return;
         setResults([]);
       } finally {

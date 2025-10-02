@@ -31,7 +31,7 @@ export default function UserSidebarCard({ user }: Props) {
           setFollowing(data.followingCount);
         }
       } catch (_err) {
-        console.error("Error cargando followersCount:", err);
+        console.error("Error cargando followersCount:", _err);
       }
     }
     if (user.id) loadCounts();

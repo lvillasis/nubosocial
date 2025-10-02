@@ -127,7 +127,7 @@ export default function EditProfileModal({
           }
         }
       } catch (_err) {
-        console.error("Error subiendo imagen:", err);
+        console.error("Error subiendo imagen:", _err);
       }
     }
 

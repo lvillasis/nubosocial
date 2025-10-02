@@ -125,14 +125,14 @@ export default function LoginPage() {
         });
       } catch (_err) {
         // no bloqueamos la navegación por esto pero lo logueamos
-        console.warn("No se pudo crear refresh token:", err);
+        console.warn("No se pudo crear refresh token:", _err);
       }
 
       // 3) Redirigir al profile (usa la url devuelta por signIn si existe)
       const redirectTo = (res as any)?.url || "/profile";
       router.push(redirectTo);
     } catch (_err) {
-      console.error("login error:", err);
+      console.error("login error:", _err);
       showMsg(t("Error al iniciar sesión"));
     } finally {
       setSubmitting(false);
