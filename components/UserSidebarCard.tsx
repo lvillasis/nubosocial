@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 interface Props {
   user: {
