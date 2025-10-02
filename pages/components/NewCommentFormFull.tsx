@@ -1,31 +1,13 @@
+// components/NewCommentFormFull.tsx
 import { useState } from "react";
-
-interface Comment {
-  id: string;
-  content: string;
-  author?: { name: string };
-}
-
-interface Post {
-  id: string;
-  content: string;
-  createdAt: string;
-  image?: string;
-  likes?: { userId: string }[];
-  comments: Comment[];
-  author?: {
-    name: string | null;
-    image: string | null;
-  };
-}
-
+import type { PostWithRelations } from "@/types/domain";
 
 export default function NewCommentFormFull({
   postId,
   onCommentAdded,
 }: {
   postId: string;
-  onCommentAdded: (updatedPost: Post) => void;
+  onCommentAdded: (updatedPost: PostWithRelations) => void;
 }) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,18 +16,27 @@ export default function NewCommentFormFull({
     if (!content.trim()) return;
     setLoading(true);
 
-    const res = await fetch(`/api/comments/create?includePost=true`, {
+    try {
+      const res = await fetch(`/api/comments/create?includePost=true`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId, content }),
-    });
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (res.ok) {
-      const updatedPost = await res.json();
-      onCommentAdded(updatedPost); // ✅ ahora solo pasa 1 argumento
-      setContent("");
+      if (res.ok) {
+        const json = await res.json();
+        // tu endpoint devuelve directamente el post actualizado
+        const updatedPost = (json as any) as PostWithRelations;
+        onCommentAdded(updatedPost);
+        setContent("");
+      } else {
+        console.error("Error creando comentario:", await res.text());
+      }
+    } catch (err) {
+      setLoading(false);
+      console.error("Network error creando comentario:", err);
     }
   };
 
@@ -70,4 +61,3 @@ export default function NewCommentFormFull({
     </div>
   );
 }
-

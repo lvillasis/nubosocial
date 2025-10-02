@@ -106,14 +106,14 @@ export default function PostDetail() {
         <>
           {/* Sidebar Izquierdo */}
           <aside className="hidden lg:block w-64 sticky top-6 self-start h-fit bg-white dark:bg-gray-900 text-black dark:text-white rounded-2xl shadow-xl p-4 border border-gray-300 dark:border-gray-700 transition-colors">
-            <UserSidebarCard
-              user={{
-                id: session.user.id,
-                name: session.user.name || "Sin nombre",
-                username: (session.user as any)?.username || "sin-usuario",
-                image: session.user.image || "/default-avatar.png",
-              }}
-            />
+           <UserSidebarCard
+            user={{
+              id: session.user.id ?? "", // ✅ fallback a string vacío
+              name: session.user.name || "Sin nombre",
+              username: (session.user as any)?.username || "sin-usuario",
+              image: session.user.image || "/default-avatar.png",
+            }}
+          />
           </aside>
 
           {/* Columna central */}

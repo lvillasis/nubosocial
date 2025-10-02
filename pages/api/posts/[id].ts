@@ -4,6 +4,9 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { v2 as cloudinary } from "cloudinary";
 
+// Importar tipos de Prisma para tipar los resultados incluidos
+import type { Comment as PrismaComment } from "@prisma/client";
+
 /**
  * Extrae public_id de una URL típica de Cloudinary.
  * Soporta URLs con /upload/v123/... y quita la extension.
@@ -36,6 +39,16 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY ?? "",
   api_secret: process.env.CLOUDINARY_API_SECRET ?? "",
 });
+
+// tipo local que refleja la inclusión de `author` en el comment
+type CommentWithAuthor = PrismaComment & {
+  author: {
+    id: string;
+    name: string;
+    username: string;
+    image?: string | null;
+  };
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
@@ -70,11 +83,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       if (!post) return res.status(404).json({ error: "Post no encontrado" });
 
-      const comments = await prisma.comment.findMany({
+      // tipar explícitamente el array resultante porque `prisma` fue casteado a any arriba
+      const comments = (await prisma.comment.findMany({
         where: { postId: id },
         include: { author: { select: { id: true, name: true, username: true, image: true } } },
         orderBy: { createdAt: "desc" },
-      });
+      })) as CommentWithAuthor[];
 
       return res.status(200).json({
         id: post.id,
@@ -86,7 +100,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         author: post.author,
         likesCount: (post.likes ?? []).length,
         liked: currentUserId ? (post.likes ?? []).some((l: any) => l.userId === currentUserId) : false,
-        comments: comments.map((c) => ({
+        comments: comments.map((c: CommentWithAuthor) => ({
           id: c.id,
           content: c.content,
           createdAt: c.createdAt.toISOString(),
@@ -126,8 +140,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.setHeader("Allow", "GET, DELETE");
     return res.status(405).json({ error: "Método no permitido" });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error en /api/posts/[id]:", err);
-    return res.status(500).json({ error: "Error interno del servidor", details: err?.message });
+    // si quieres enviar más info en dev, haz un typeof guard aquí antes de leer .message
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 }

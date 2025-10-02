@@ -1,6 +1,7 @@
 // pages/api/posts/index.ts
 import { getServerSession } from "next-auth/next";
 import type { NextApiRequest, NextApiResponse } from "next";
+import type { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
 
@@ -19,8 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (req.method === "GET") {
-      // Construimos el include dinámicamente: si hay userId incluimos likes para ese usuario
-      const includeObj: any = {
+      const includeBase: Prisma.PostInclude = {
         author: {
           select: { id: true, name: true, username: true, image: true },
         },
@@ -37,29 +37,51 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
 
       if (userId) {
-        includeObj.likes = {
-          where: { userId },
-          select: { id: true },
+        // incluir likes para este userId (para saber si lo ha liked)
+        const includeWithLikes: Prisma.PostInclude = {
+          ...includeBase,
+          likes: { where: { userId }, select: { id: true, userId: true } },
         };
+
+        const posts = await prisma.post.findMany({
+          orderBy: { createdAt: "desc" },
+          include: includeWithLikes,
+        });
+
+        const formattedPosts = posts.map((post) => ({
+          id: post.id,
+          content: post.content,
+          createdAt: post.createdAt,
+          author: post.author,
+          image: post.image,
+          likesCount: post._count?.likes ?? 0,
+          // aquí post.likes existe porque pedimos includeWithLikes
+          liked: (Array.isArray((post as any).likes) ? (post as any).likes.length : 0) > 0,
+          comments: post.comments ?? [],
+        }));
+
+        return res.status(200).json(formattedPosts);
+      } else {
+        // sin userId no pedimos likes
+        const posts = await prisma.post.findMany({
+          orderBy: { createdAt: "desc" },
+          include: includeBase,
+        });
+
+        const formattedPosts = posts.map((post) => ({
+          id: post.id,
+          content: post.content,
+          createdAt: post.createdAt,
+          author: post.author,
+          image: post.image,
+          likesCount: post._count?.likes ?? 0,
+          // no pedimos 'likes' en este query -> asumimos que el usuario no ha "liked"
+          liked: false,
+          comments: post.comments ?? [],
+        }));
+
+        return res.status(200).json(formattedPosts);
       }
-
-      const posts = await prisma.post.findMany({
-        orderBy: { createdAt: "desc" },
-        include: includeObj,
-      });
-
-      const formattedPosts = posts.map((post) => ({
-        id: post.id,
-        content: post.content,
-        createdAt: post.createdAt,
-        author: post.author,
-        image: post.image,
-        likesCount: post._count?.likes ?? 0,
-        liked: Array.isArray(post.likes) ? post.likes.length > 0 : false,
-        comments: post.comments ?? [],
-      }));
-
-      return res.status(200).json(formattedPosts);
     }
 
     if (req.method === "POST") {
@@ -77,33 +99,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         data: { content: content.trim(), authorId: userId },
       });
 
+      // traer el post completo incluyendo _count, comments y likes (para este user)
+      const fullInclude: Prisma.PostInclude = {
+        author: { select: { id: true, name: true, username: true, image: true } },
+        _count: { select: { likes: true } },
+        likes: { where: { userId }, select: { id: true, userId: true } },
+        comments: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            author: { select: { id: true, name: true, username: true } },
+          },
+          orderBy: { createdAt: "asc" },
+        },
+      };
+
       const fullPost = await prisma.post.findUnique({
         where: { id: newPost.id },
-        include: {
-          author: { select: { id: true, name: true, username: true, image: true } },
-          _count: { select: { likes: true } },
-          likes: { where: { userId }, select: { id: true } },
-          comments: {
-            select: {
-              id: true,
-              content: true,
-              createdAt: true,
-              author: { select: { id: true, name: true, username: true } },
-            },
-            orderBy: { createdAt: "asc" },
-          },
-        },
+        include: fullInclude,
       });
 
+      if (!fullPost) return res.status(500).json({ error: "No se pudo recuperar el post recién creado" });
+
       const formattedPost = {
-        id: fullPost!.id,
-        content: fullPost!.content,
-        createdAt: fullPost!.createdAt,
-        author: fullPost!.author,
-        image: fullPost!.image,
-        likesCount: fullPost!._count?.likes ?? 0,
-        liked: fullPost!.likes?.length > 0 ?? false,
-        comments: fullPost!.comments ?? [],
+        id: fullPost.id,
+        content: fullPost.content,
+        createdAt: fullPost.createdAt,
+        author: fullPost.author,
+        image: fullPost.image,
+        likesCount: fullPost._count?.likes ?? 0,
+        // liked: true si el array likes (incluido para este user) tiene elementos
+        liked: (Array.isArray((fullPost as any).likes) ? (fullPost as any).likes.length : 0) > 0,
+        comments: fullPost.comments ?? [],
       };
 
       return res.status(201).json(formattedPost);

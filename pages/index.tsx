@@ -261,14 +261,14 @@ export default function Home() {
           {/* Sidebar Izquierdo */}
           <aside className="hidden lg:block w-64 sticky top-6 self-start h-fit rounded-2xl glass p-4 border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.04)] transition-colors">
             {session && (
-              <UserSidebarCard
-                user={{
-                  id: session.user.id,
-                  name: session.user.name || "Sin nombre",
-                  username: (session.user as any).username || "sin-usuario",
-                  image: session.user.image || "/default-avatar.png",
-                }}
-              />
+             <UserSidebarCard
+              user={{
+                id: session.user.id ?? "", // ✅ fallback a string vacío
+                name: session.user.name || "Sin nombre",
+                username: (session.user as any)?.username || "sin-usuario",
+                image: session.user.image || "/default-avatar.png",
+              }}
+            />
             )}
           </aside>
 

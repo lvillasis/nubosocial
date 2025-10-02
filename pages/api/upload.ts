@@ -1,6 +1,6 @@
 // pages/api/upload.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import prisma from "@/lib/prisma";
 import formidable, { File } from "formidable";
@@ -8,9 +8,9 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-  api_key: process.env.CLOUDINARY_API_KEY!,
-  api_secret: process.env.CLOUDINARY_API_SECRET!,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME ?? "",
+  api_key: process.env.CLOUDINARY_API_KEY ?? "",
+  api_secret: process.env.CLOUDINARY_API_SECRET ?? "",
 });
 
 export const config = {
@@ -41,7 +41,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "No se recibió el archivo" });
     }
 
-    const type = (fields.type as string) || "avatar"; // expected "avatar" | "cover"
+    // Normalizar fields.type: puede ser string | string[] | undefined
+    let rawType = fields.type;
+    const typeStr = Array.isArray(rawType) ? rawType[0] : rawType;
+    let type = (typeStr ?? "avatar").toString();
+
+    // validar valores permitidos
+    if (type !== "avatar" && type !== "cover") type = "avatar";
 
     // subir a cloudinary
     const result = await cloudinary.uploader.upload(file.filepath, {
@@ -62,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     return res.status(200).json({ success: true, url: result.secure_url, user: updatedUser });
-  } catch (_err) {
+  } catch (err: unknown) {
     console.error("❌ Error en upload:", err);
     return res.status(500).json({ error: "Error al subir imagen" });
   }

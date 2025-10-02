@@ -41,6 +41,7 @@ export default function FollowingPage({ profileUser, users, total, page, totalPa
     setList(users);
     setCurPage(page);
     setFollowMap(Object.fromEntries(initiallyFollowedIds.map((id) => [id, true])));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users, page, initiallyFollowedIds.join(",")]);
 
   const fetchPage = async (p: number) => {
@@ -52,7 +53,7 @@ export default function FollowingPage({ profileUser, users, total, page, totalPa
       setList(json.following ?? []);
       setCurPage(json.page ?? p);
     } catch (_err) {
-      console.error("Error cargando following:", err);
+      console.error("Error cargando following:", _err);
     }
   };
 
@@ -75,7 +76,7 @@ export default function FollowingPage({ profileUser, users, total, page, totalPa
       if (!res.ok) throw new Error(json?.error || "Error");
       setFollowMap((m) => ({ ...m, [targetId]: Boolean(json.followed) }));
     } catch (_err) {
-      console.error("Follow error:", err);
+      console.error("Follow error:", _err);
       setFollowMap((m) => ({ ...m, [targetId]: currently }));
       alert("No se pudo actualizar el seguimiento. Intenta de nuevo.");
     } finally {
@@ -87,18 +88,7 @@ export default function FollowingPage({ profileUser, users, total, page, totalPa
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#05060a] dark:to-[#071018] text-black dark:text-white px-4">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 py-8">
         <aside className="hidden lg:block w-64 sticky top-6 self-start">
-          {session?.user ? (
-            <ProfileSidebar
-              user={{
-                id: (session.user as any).id || "",
-                name: (session.user as any).name || "",
-                username: (session.user as any).username || "",
-                image: (session.user as any).image || "/default-avatar.png",
-              }}
-            />
-          ) : (
-            <div className="p-2" />
-          )}
+          {session?.user ? <ProfileSidebar /> : <div className="p-2" />}
         </aside>
 
         <main className="flex-1 max-w-4xl w-full mx-auto">
@@ -115,14 +105,21 @@ export default function FollowingPage({ profileUser, users, total, page, totalPa
                   <div className="mt-[-48px]">
                     <div className="w-[96px] h-[96px] rounded-full bg-gradient-to-br from-purple-600 to-indigo-500 p-0.5">
                       <div className="w-full h-full rounded-full bg-[#0d1117] overflow-hidden">
-                        <Image src={profileUser?.image ?? "/default-avatar.png"} alt={profileUser?.name ?? profileUser?.username} width={96} height={96} className="object-cover rounded-full" />
+                        {/* asegurar src y alt como strings */}
+                        <Image
+                          src={profileUser?.image ?? "/default-avatar.png"}
+                          alt={(profileUser?.name ?? profileUser?.username) ?? "Usuario NUBO"}
+                          width={96}
+                          height={96}
+                          className="object-cover rounded-full"
+                        />
                       </div>
                     </div>
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <h2 className="text-lg font-bold leading-tight truncate">{profileUser?.name ?? "Usuario"}</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">@{profileUser?.username}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">@{profileUser?.username ?? "sin-usuario"}</p>
                     {profileUser?.bio && <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{profileUser.bio}</p>}
                   </div>
                 </div>
@@ -179,7 +176,7 @@ export default function FollowingPage({ profileUser, users, total, page, totalPa
 
         <aside className="hidden lg:block w-80">
           <div className="rounded-2xl p-6 bg-white/60 dark:bg-[#0b1220] border border-gray-200 dark:border-gray-800 shadow-lg sticky top-6">
-            <RightSidebar t={(s:string)=>s} activeTag={profileUser?.username} />
+            <RightSidebar t={(s: string) => s} activeTag={profileUser?.username ?? ""} />
           </div>
         </aside>
       </div>

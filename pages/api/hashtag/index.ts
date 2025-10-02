@@ -13,13 +13,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const posts = await prisma.post.findMany({
       where: {
         content: {
-          contains: `#${tag}`, // Busca hashtags tipo "#react"
-          mode: "insensitive", // No distingue mayúsculas/minúsculas
+          contains: `#${tag}`,
+          mode: "insensitive",
         },
       },
       include: {
         author: { select: { name: true, image: true, username: true } },
-        likedBy: { select: { id: true } },
+        // aquí usamos la relación real 'likes' y pedimos solo el userId
+        likes: { select: { userId: true } },
         comments: {
           include: {
             author: { select: { name: true } },
@@ -30,8 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     res.status(200).json({ posts });
-  } catch (error) {
-    console.error("Error al buscar hashtag:", error);
+  } catch (err: unknown) {
+    console.error("Error al buscar hashtag:", err);
     res.status(500).json({ error: "Error del servidor" });
   }
 }

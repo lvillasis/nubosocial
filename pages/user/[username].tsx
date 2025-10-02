@@ -95,7 +95,7 @@ export default function PublicProfile({
       setIsFollowing(Boolean(json.followed));
       if (typeof json.followersCount === "number") setFollowersCount(Number(json.followersCount));
     } catch (_err) {
-      console.error("Follow client error:", err);
+      console.error("Follow client error:", _err);
       // rollback
       setIsFollowing(prevFollowing);
       setFollowersCount(prevFollowersCount);
@@ -146,19 +146,8 @@ export default function PublicProfile({
     <div className="min-h-screen font-sans px-4 text-black dark:text-white bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#05060a] dark:to-[#071018]">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 py-8">
         {/* Left sidebar */}
-        <aside className="hidden lg:block w-64 sticky top-6 self-start cursor-pointer">
-          {session?.user ? (
-            <ProfileSidebar
-              user={{
-                id: (session.user as any).id || "",
-                name: (session.user as any).name || "",
-                username: (session.user as any).username || "",
-                image: (session.user as any).image || "/default-avatar.png",
-              }}
-            />
-          ) : (
-            <div className="p-2" />
-          )}
+        <aside className="hidden lg:block w-64 sticky top-6 self-start">
+          {session?.user ? <ProfileSidebar /> : <div className="p-2" />}
         </aside>
 
         {/* Center */}

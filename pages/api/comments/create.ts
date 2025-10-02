@@ -1,3 +1,4 @@
+// pages/api/comments/create.ts
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
@@ -16,13 +17,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { postId, content } = req.body;
-  const includePost = req.query.includePost === "true"; // ← parámetro opcional por query string
+  const includePost = req.query.includePost === "true";
 
   if (!postId || typeof postId !== "string" || !content || typeof content !== "string") {
     return res.status(400).json({ error: "Faltan campos o datos inválidos" });
   }
 
   try {
+    // crear comentario
     await prisma.comment.create({
       data: {
         content,
@@ -35,20 +37,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const updatedPost = await prisma.post.findUnique({
         where: { id: postId },
         include: {
-          author: { select: { name: true, image: true } },
+          author: { select: { id: true, name: true, image: true, username: true } },
           comments: {
-            include: { author: { select: { name: true } } },
-            orderBy: { createdAt: "asc" },
+            include: { author: { select: { id: true, name: true, image: true, username: true } } },
+            orderBy: { createdAt: "desc" },
           },
-          likes: true,
+          likes: { select: { userId: true } },
         },
       });
 
       if (!updatedPost) return res.status(404).json({ error: "Post no encontrado" });
+
+      // devolver el post directamente (coherente con PostWithRelations)
       return res.status(200).json(updatedPost);
     }
 
-    // Si no se pidió el post, solo devuelve el nuevo comentario
+    // si no piden el post, devolver el nuevo comentario con author mínimo
     const newComment = await prisma.comment.findFirst({
       where: {
         postId,
@@ -56,17 +60,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         author: { email: session.user.email },
       },
       include: {
-        author: { select: { name: true } },
+        author: { select: { id: true, name: true, image: true, username: true } },
       },
       orderBy: { createdAt: "desc" },
     });
 
     return res.status(200).json(newComment);
-  } catch (_err) {
-    console.error("❌ Error al guardar comentario:", _err);
+  } catch (err) {
+    console.error("❌ Error al guardar comentario:", err);
     return res.status(500).json({ error: "Error al guardar comentario" });
   }
 }
-
-
-
