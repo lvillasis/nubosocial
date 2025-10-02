@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import RightSidebar from "@/components/RightSidebar";
-import ProfileSidebar from "@/pages/components/ProfileSidebar";
+import ProfileSidebar from "@/components/ProfileSidebar";
 import { useSession } from "next-auth/react";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";

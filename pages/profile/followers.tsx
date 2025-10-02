@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import RightSidebar from "@/components/RightSidebar";
-import ProfileSidebar from "@/pages/components/ProfileSidebar";
+import ProfileSidebar from "@/components/ProfileSidebar";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";

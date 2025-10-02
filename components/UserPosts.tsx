@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
-import NewCommentFormFull from "@/pages/components/NewCommentFormFull";
+import NewCommentFormFull from "@/components/NewCommentFormFull";
 import { Heart } from "lucide-react";
 import { useSession } from "next-auth/react";
 

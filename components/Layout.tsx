@@ -1,5 +1,5 @@
 // components/Layout.tsx
-import Navbar from "@/pages/components/Navbar";
+import Navbar from "@/components/Navbar";
 import { ReactNode } from "react";
 
 interface Props {

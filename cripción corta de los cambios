@@ -1,0 +1,144 @@
+warning: in the working copy of 'components/Layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/RightSidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/UserPosts.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/_app.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/index.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/post/[id].tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/profile.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/profile/followers.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/profile/following.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'pages/user/[username].tsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/components/Layout.tsx b/components/Layout.tsx[m
+[1mindex 0acfd5c..069f1d3 100644[m
+[1m--- a/components/Layout.tsx[m
+[1m+++ b/components/Layout.tsx[m
+[36m@@ -1,5 +1,5 @@[m
+ // components/Layout.tsx[m
+[31m-import Navbar from "@/pages/components/Navbar";[m
+[32m+[m[32mimport Navbar from "@/components/Navbar";[m
+ import { ReactNode } from "react";[m
+ [m
+ interface Props {[m
+[1mdiff --git a/components/RightSidebar.tsx b/components/RightSidebar.tsx[m
+[1mindex e2077a8..d304e57 100644[m
+[1m--- a/components/RightSidebar.tsx[m
+[1m+++ b/components/RightSidebar.tsx[m
+[36m@@ -4,7 +4,7 @@[m
+ import { useEffect, useRef, useState } from "react";[m
+ import Link from "next/link";[m
+ import { Newspaper, Megaphone, Calendar, TrendingUp, ChevronRight, Sun, Moon } from "lucide-react";[m
+[31m-import SearchBar from "@/pages/components/SearchBar"; // ajusta si tu SearchBar está en otro path[m
+[32m+[m[32mimport SearchBar from "@/components/SearchBar"; // ajusta si tu SearchBar está en otro path[m
+ [m
+ type Trend = { hashtag: string; count: number };[m
+ type PreviewPost = {[m
+[1mdiff --git a/components/UserPosts.tsx b/components/UserPosts.tsx[m
+[1mindex 3caed07..1e6a2aa 100644[m
+[1m--- a/components/UserPosts.tsx[m
+[1m+++ b/components/UserPosts.tsx[m
+[36m@@ -5,7 +5,7 @@[m [mimport { useEffect, useMemo, useState } from "react";[m
+ import Image from "next/image";[m
+ import { motion, AnimatePresence } from "framer-motion";[m
+ import { format } from "date-fns";[m
+[31m-import NewCommentFormFull from "@/pages/components/NewCommentFormFull";[m
+[32m+[m[32mimport NewCommentFormFull from "@/components/NewCommentFormFull";[m
+ import { Heart } from "lucide-react";[m
+ import { useSession } from "next-auth/react";[m
+ [m
+[1mdiff --git a/pages/_app.tsx b/pages/_app.tsx[m
+[1mindex 69f1235..9d91078 100644[m
+[1m--- a/pages/_app.tsx[m
+[1m+++ b/pages/_app.tsx[m
+[36m@@ -3,7 +3,7 @@[m [mimport "@/styles/globals.css";[m
+ import type { AppProps } from "next/app";[m
+ import { SessionProvider } from "next-auth/react";[m
+ import { appWithTranslation } from "next-i18next";[m
+[31m-import Layout from "@/pages/components/Layout";[m
+[32m+[m[32mimport Layout from "@/components/Layout";[m
+ import { ThemeProvider } from "next-themes";[m
+ [m
+ function MyApp({ Component, pageProps: { session, ...pageProps }, router }: AppProps) {[m
+[1mdiff --git a/pages/index.tsx b/pages/index.tsx[m
+[1mindex 975900a..d8aef51 100644[m
+[1m--- a/pages/index.tsx[m
+[1m+++ b/pages/index.tsx[m
+[36m@@ -8,10 +8,10 @@[m [mimport { useTranslation } from "next-i18next";[m
+ import { useEffect, useState } from "react";[m
+ import Image from "next/image";[m
+ import { useSession } from "next-auth/react";[m
+[31m-import NewPostForm from "@/pages/components/NewPostForm";[m
+[31m-import NewCommentFormSimple from "@/pages/components/NewCommentFormSimple";[m
+[31m-import UserSidebarCard from "@/pages/components/UserSidebarCard";[m
+[31m-import SearchBar from "./components/SearchBar";[m
+[32m+[m[32mimport NewPostForm from "@/components/NewPostForm";[m
+[32m+[m[32mimport NewCommentFormSimple from "@/components/NewCommentFormSimple";[m
+[32m+[m[32mimport UserSidebarCard from "@/components/UserSidebarCard";[m
+[32m+[m[32mimport SearchBar from "@/components/SearchBar";[m
+ import { format } from "date-fns";[m
+ import { AnimatePresence, motion } from "framer-motion";[m
+ import { triggerLikeExplosion } from "@/utils/likeAnimation";[m
+[1mdiff --git a/pages/post/[id].tsx b/pages/post/[id].tsx[m
+[1mindex fcbb9bb..159cc63 100644[m
+[1m--- a/pages/post/[id].tsx[m
+[1m+++ b/pages/post/[id].tsx[m
+[36m@@ -5,7 +5,7 @@[m [mimport { useSession } from "next-auth/react";[m
+ import { triggerLikeExplosion } from "@/utils/likeAnimation";[m
+ import { serverSideTranslations } from "next-i18next/serverSideTranslations";[m
+ import { useTranslation } from "next-i18next";[m
+[31m-import UserSidebarCard from "@/pages/components/UserSidebarCard";[m
+[32m+[m[32mimport UserSidebarCard from "@/components/UserSidebarCard";[m
+ import RightSidebar from "@/components/RightSidebar";[m
+ [m
+ export default function PostDetail() {[m
+[1mdiff --git a/pages/profile.tsx b/pages/profile.tsx[m
+[1mindex 7780cf8..382fe49 100644[m
+[1m--- a/pages/profile.tsx[m
+[1m+++ b/pages/profile.tsx[m
+[36m@@ -10,15 +10,15 @@[m
+   import { useRouter } from "next/router";[m
+   import { useEffect, useState } from "react";[m
+   import type { Session } from "next-auth";[m
+[31m-  import NewPostForm from "@/pages/components/NewPostForm";[m
+[31m-  import NewCommentFormFull from "@/pages/components/NewCommentFormFull";[m
+[32m+[m[32m  import NewPostForm from "@/components/NewPostForm";[m
+[32m+[m[32m  import NewCommentFormFull from "@/components/NewCommentFormFull";[m
+   import { toast } from "react-toastify";[m
+[31m-  import SearchBar from "./components/SearchBar";[m
+[32m+[m[32m  import SearchBar from "@/components/SearchBar";[m
+   import { format } from "date-fns";[m
+   import { motion, AnimatePresence } from "framer-motion";[m
+   import { Heart } from "lucide-react";[m
+[31m-  import ProfileSidebar from "@/pages/components/ProfileSidebar";[m
+[31m-  import EditProfileModal from "@/pages/components/EditProfileModal";[m
+[32m+[m[32m  import ProfileSidebar from "@/components/ProfileSidebar";[m
+[32m+[m[32m  import EditProfileModal from "@/components/EditProfileModal";[m
+   import RightSidebar from "@/components/RightSidebar";[m
+   import { useProfileUpdate } from "@/hooks/useProfileUpdate";[m
+   import type { PostWithRelations } from "@/types/domain";[m
+[1mdiff --git a/pages/profile/followers.tsx b/pages/profile/followers.tsx[m
+[1mindex 482faeb..03c255a 100644[m
+[1m--- a/pages/profile/followers.tsx[m
+[1m+++ b/pages/profile/followers.tsx[m
+[36m@@ -8,7 +8,7 @@[m [mimport Link from "next/link";[m
+ import { useRouter } from "next/router";[m
+ import { useEffect, useState } from "react";[m
+ import RightSidebar from "@/components/RightSidebar";[m
+[31m-import ProfileSidebar from "@/pages/components/ProfileSidebar";[m
+[32m+[m[32mimport ProfileSidebar from "@/components/ProfileSidebar";[m
+ import { useSession } from "next-auth/react";[m
+ import { motion } from "framer-motion";[m
+ import dynamic from "next/dynamic";[m
+[1mdiff --git a/pages/profile/following.tsx b/pages/profile/following.tsx[m
+[1mindex 320cfdb..c40e58e 100644[m
+[1m--- a/pages/profile/following.tsx[m
+[1m+++ b/pages/profile/following.tsx[m
+[36m@@ -8,7 +8,7 @@[m [mimport Link from "next/link";[m
+ import { useRouter } from "next/router";[m
+ import { useEffect, useState } from "react";[m
+ import RightSidebar from "@/components/RightSidebar";[m
+[31m-import ProfileSidebar from "@/pages/components/ProfileSidebar";[m
+[32m+[m[32mimport ProfileSidebar from "@/components/ProfileSidebar";[m
+ import { useSession } from "next-auth/react";[m
+ import { motion } from "framer-motion";[m
+ [m
+[1mdiff --git

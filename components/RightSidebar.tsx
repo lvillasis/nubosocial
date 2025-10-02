@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Newspaper, Megaphone, Calendar, TrendingUp, ChevronRight, Sun, Moon } from "lucide-react";
-import SearchBar from "@/pages/components/SearchBar"; // ajusta si tu SearchBar está en otro path
+import SearchBar from "@/components/SearchBar"; // ajusta si tu SearchBar está en otro path
 
 type Trend = { hashtag: string; count: number };
 type PreviewPost = {

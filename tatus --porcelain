@@ -1,0 +1,15 @@
+[35mcomponents/Layout.tsx[m[36m:[m[32m2[m[36m:[mimport Navbar from "@/[1;31mpages/components[m/Navbar";
+[35mcomponents/RightSidebar.tsx[m[36m:[m[32m7[m[36m:[mimport SearchBar from "@/[1;31mpages/components[m/SearchBar"; // ajusta si tu SearchBar está en otro path
+[35mcomponents/UserPosts.tsx[m[36m:[m[32m8[m[36m:[mimport NewCommentFormFull from "@/[1;31mpages/components[m/NewCommentFormFull";
+[35mpages/_app.tsx[m[36m:[m[32m6[m[36m:[mimport Layout from "@/[1;31mpages/components[m/Layout";
+[35mpages/index.tsx[m[36m:[m[32m11[m[36m:[mimport NewPostForm from "@/[1;31mpages/components[m/NewPostForm";
+[35mpages/index.tsx[m[36m:[m[32m12[m[36m:[mimport NewCommentFormSimple from "@/[1;31mpages/components[m/NewCommentFormSimple";
+[35mpages/index.tsx[m[36m:[m[32m13[m[36m:[mimport UserSidebarCard from "@/[1;31mpages/components[m/UserSidebarCard";
+[35mpages/post/[id].tsx[m[36m:[m[32m8[m[36m:[mimport UserSidebarCard from "@/[1;31mpages/components[m/UserSidebarCard";
+[35mpages/profile.tsx[m[36m:[m[32m13[m[36m:[m  import NewPostForm from "@/[1;31mpages/components[m/NewPostForm";
+[35mpages/profile.tsx[m[36m:[m[32m14[m[36m:[m  import NewCommentFormFull from "@/[1;31mpages/components[m/NewCommentFormFull";
+[35mpages/profile.tsx[m[36m:[m[32m20[m[36m:[m  import ProfileSidebar from "@/[1;31mpages/components[m/ProfileSidebar";
+[35mpages/profile.tsx[m[36m:[m[32m21[m[36m:[m  import EditProfileModal from "@/[1;31mpages/components[m/EditProfileModal";
+[35mpages/profile/followers.tsx[m[36m:[m[32m11[m[36m:[mimport ProfileSidebar from "@/[1;31mpages/components[m/ProfileSidebar";
+[35mpages/profile/following.tsx[m[36m:[m[32m11[m[36m:[mimport ProfileSidebar from "@/[1;31mpages/components[m/ProfileSidebar";
+[35mpages/user/[username].tsx[m[36m:[m[32m12[m[36m:[mimport ProfileSidebar from "@/[1;31mpages/components[m/ProfileSidebar";

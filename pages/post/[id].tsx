@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { triggerLikeExplosion } from "@/utils/likeAnimation";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import UserSidebarCard from "@/pages/components/UserSidebarCard";
+import UserSidebarCard from "@/components/UserSidebarCard";
 import RightSidebar from "@/components/RightSidebar";
 
 export default function PostDetail() {
