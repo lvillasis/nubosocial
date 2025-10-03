@@ -1,5 +1,4 @@
-// pages/messages/[id].tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -9,6 +8,14 @@ const ChatWindow = dynamic(() => import("../../components/ChatWindow"), { ssr: f
 export default function ConversationPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false); // <-- nuevo
+
+  useEffect(() => {
+    setIsClient(true); // indica que ya estamos en cliente
+  }, []);
+
+  if (!isClient) return null; // no renderizamos nada en SSR
+
   const { id } = router.query;
   const currentUserId = (session?.user as any)?.id ?? null;
 
@@ -21,7 +28,6 @@ export default function ConversationPage() {
         await fetch(`/api/conversations/${encodeURIComponent(convId)}/read`, { method: "POST" });
       } catch (_err) {
         // ignore, endpoint may not exist — don't break page
-        // console.debug("mark read failed", err);
       }
     })();
   }, [id, session]);

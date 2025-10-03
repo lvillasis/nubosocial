@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 
 export default function TestThemePage() {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => setIsClient(true), []);
 
-  if (!mounted) return null;
+  if (!isClient) return null;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-black dark:text-white transition-all duration-500">

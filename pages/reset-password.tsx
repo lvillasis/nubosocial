@@ -1,15 +1,22 @@
-// pages/reset-password.tsx
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 
 export default function ResetPasswordPage() {
   const router = useRouter();
-  const { id, token } = router.query as { id?: string; token?: string };
+  const [isClient, setIsClient] = useState(false); // <-- nuevo
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [valid, setValid] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) return null; // evita usar router en SSR
+
+  const { id, token } = router.query as { id?: string; token?: string };
 
   useEffect(() => {
     if (id && token) setValid(true);
