@@ -41,3 +41,5 @@ export default function ConversationPage() {
     </div>
   );
 }
+
+export const getServerSideProps = async () => ({ props: {} });

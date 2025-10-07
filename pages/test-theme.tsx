@@ -21,3 +21,5 @@ export default function TestThemePage() {
     </div>
   );
 }
+
+export const getServerSideProps = async () => ({ props: {} });
