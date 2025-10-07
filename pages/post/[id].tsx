@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { triggerLikeExplosion } from "@/utils/likeAnimation";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import UserSidebarCard from "@/components/UserSidebarCard";
 import RightSidebar from "@/components/RightSidebar";
@@ -17,11 +16,18 @@ export default function PostDetail() {
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
+  const [isClient, setIsClient] = useState(false);
+
+  // 🔹 Evita que Next.js intente usar useRouter() en el servidor
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
-    if (!id) return;
-    fetchPost();
-  }, [id]);
+    if (isClient && id) {
+      fetchPost();
+    }
+  }, [id, isClient]);
 
   const fetchPost = async () => {
     setLoading(true);
@@ -64,7 +70,6 @@ export default function PostDetail() {
         }));
       }
     } catch (error) {
-      console.log("Liking post:", postId);
       console.error("Error al dar like:", error);
     }
   };
@@ -93,6 +98,11 @@ export default function PostDetail() {
       console.error(error);
     }
   };
+
+  // 🚫 Evita renderizar en servidor
+  if (!isClient) {
+    return <p className="p-4 text-gray-400">Cargando...</p>;
+  }
 
   if (loading) return <p className="p-4 text-gray-400">Cargando...</p>;
   if (!post) return <p className="p-4 text-red-400">Post no encontrado</p>;
