@@ -3,6 +3,30 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import prisma from "@/lib/prisma";
+import type { Conversation, Message } from "@prisma/client";
+
+type MessageWithSender = Message & {
+  sender?: {
+    id: string;
+    name: string | null;
+    username: string | null;
+    image?: string | null;
+  };
+};
+
+type ParticipantWithUser = {
+  user: {
+    id: string;
+    name: string | null;
+    username: string | null;
+    image?: string | null;
+  };
+};
+
+type ConversationWithRelations = Conversation & {
+  messages?: MessageWithSender[];
+  participants?: ParticipantWithUser[];
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getServerSession(req, res, authOptions);
@@ -32,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       // normalizar: devolver lastMessage y participants shape fácil
-      const normalized = convs.map((c) => ({
+      const normalized = (convs as ConversationWithRelations[]).map((c) => ({
         ...c,
         lastMessage: Array.isArray(c.messages) && c.messages.length ? c.messages[0] : null,
       }));

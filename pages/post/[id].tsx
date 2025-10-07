@@ -1,5 +1,4 @@
 // pages/post/[id].tsx
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { triggerLikeExplosion } from "@/utils/likeAnimation";
@@ -8,8 +7,6 @@ import UserSidebarCard from "@/components/UserSidebarCard";
 import RightSidebar from "@/components/RightSidebar";
 
 export default function PostDetail() {
-  const router = useRouter();
-  const { id } = router.query;
   const { data: session } = useSession();
   const { t } = useTranslation("common");
 
@@ -17,26 +14,35 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
   const [isClient, setIsClient] = useState(false);
+  const [routeId, setRouteId] = useState<string | null>(null);
 
-  // 🔹 Evita que Next.js intente usar useRouter() en el servidor
+  // Obtener id del path (solo en cliente) y activar flag de cliente
   useEffect(() => {
     setIsClient(true);
+    if (typeof window !== "undefined") {
+      const match = window.location.pathname.match(/\/post\/([^\/]+)/);
+      if (match && match[1]) setRouteId(match[1]);
+    }
   }, []);
 
   useEffect(() => {
-    if (isClient && id) {
-      fetchPost();
+    if (isClient && routeId) {
+      fetchPost(routeId);
     }
-  }, [id, isClient]);
+  }, [isClient, routeId]);
 
-  const fetchPost = async () => {
+  const fetchPost = async (id: string) => {
     setLoading(true);
     try {
       const res = await fetch(`/api/posts/${id}`);
+      if (!res.ok) {
+        setPost(null);
+        return;
+      }
       const data = await res.json();
       setPost(data);
     } catch (error) {
-      console.error(error);
+      console.error("fetchPost error:", error);
       setPost(null);
     } finally {
       setLoading(false);
@@ -63,11 +69,9 @@ export default function PostDetail() {
           triggerLikeExplosion(postId);
         }
 
-        setPost((prev: any) => ({
-          ...prev,
-          likesCount: data.likesCount,
-          liked: data.liked,
-        }));
+        setPost((prev: any) =>
+          prev ? { ...prev, likesCount: data.likesCount, liked: data.liked } : prev
+        );
       }
     } catch (error) {
       console.error("Error al dar like:", error);
@@ -80,14 +84,15 @@ export default function PostDetail() {
       alert("Inicia sesión para comentar");
       return;
     }
-    if (!commentText.trim()) return;
+    if (!commentText.trim() || !routeId) return;
 
     try {
-      const res = await fetch(`/api/posts/${id}/comment`, {
+      const res = await fetch(`/api/posts/${routeId}/comment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: commentText }),
       });
+      if (!res.ok) return;
       const newComment = await res.json();
 
       setPost((prev: any) =>
@@ -95,11 +100,11 @@ export default function PostDetail() {
       );
       setCommentText("");
     } catch (error) {
-      console.error(error);
+      console.error("Error al comentar:", error);
     }
   };
 
-  // 🚫 Evita renderizar en servidor
+  // 🚫 Evita renderizar en servidor (SSR/prerender). Mostramos carga mientras se obtiene id y post.
   if (!isClient) {
     return <p className="p-4 text-gray-400">Cargando...</p>;
   }
@@ -140,9 +145,7 @@ export default function PostDetail() {
               </div>
 
               {/* Contenido */}
-              <p className="text-xl leading-relaxed whitespace-pre-line">
-                {post.content}
-              </p>
+              <p className="text-xl leading-relaxed whitespace-pre-line">{post.content}</p>
               {post.image && (
                 <img
                   src={post.image}
@@ -161,16 +164,12 @@ export default function PostDetail() {
                   id={`like-button-${post.id}`}
                   onClick={() => handleLike(post.id)}
                   className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all duration-200 cursor-pointer ${
-                    post.liked
-                      ? "bg-red-600 hover:bg-red-500 scale-105"
-                      : "bg-gray-800 hover:bg-gray-700"
+                    post.liked ? "bg-red-600 hover:bg-red-500 scale-105" : "bg-gray-800 hover:bg-gray-700"
                   }`}
                 >
                   ❤️ <span>{post.likesCount || 0}</span>
                 </button>
-                <span className="flex items-center gap-1 text-gray-300">
-                  💬 {post.comments.length}
-                </span>
+                <span className="flex items-center gap-1 text-gray-300">💬 {post.comments.length}</span>
               </div>
 
               {/* Comentarios */}
@@ -191,15 +190,10 @@ export default function PostDetail() {
               </form>
 
               <h3 className="font-bold text-lg mb-3">Comentarios</h3>
-              {post.comments.length === 0 && (
-                <p className="text-gray-400">No hay comentarios aún</p>
-              )}
+              {post.comments.length === 0 && <p className="text-gray-400">No hay comentarios aún</p>}
               <div className="space-y-4">
                 {post.comments.map((comment: any) => (
-                  <div
-                    key={comment.id}
-                    className="border border-gray-800 p-4 rounded-lg bg-gray-900 shadow-sm"
-                  >
+                  <div key={comment.id} className="border border-gray-800 p-4 rounded-lg bg-gray-900 shadow-sm">
                     <div className="flex items-center gap-2 mb-2">
                       <img
                         src={comment.author.image || "/default-avatar.png"}
@@ -222,9 +216,7 @@ export default function PostDetail() {
         </>
       ) : (
         <div className="flex items-center justify-center w-full h-screen">
-          <p className="text-lg text-gray-300">
-            🔒 Debes iniciar sesión para ver este contenido.
-          </p>
+          <p className="text-lg text-gray-300">🔒 Debes iniciar sesión para ver este contenido.</p>
         </div>
       )}
     </div>
