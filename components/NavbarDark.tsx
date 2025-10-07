@@ -10,8 +10,11 @@ export default function NavbarDark() {
   const router = useRouter();
   const { t } = useTranslation("common");
 
+  // Evita ejecutar router.push si router no está listo (SSR / prerender)
   const changeLanguage = (lng: string) => {
-    router.push(router.pathname, router.asPath, { locale: lng });
+    if (!router || !router.isReady) return;
+    // usar router.asPath para mantener la misma ruta + query
+    router.push(router.asPath, undefined, { locale: lng });
   };
 
   return (
@@ -28,8 +31,8 @@ export default function NavbarDark() {
         {/* Controles del usuario + idiomas */}
         <div className="flex items-center gap-4">
           <div className="flex gap-2 text-lg">
-            <button onClick={() => changeLanguage("es")} className="hover:scale-110 transition">🇪🇸</button>
-            <button onClick={() => changeLanguage("en")} className="hover:scale-110 transition">🇺🇸</button>
+            <button onClick={() => changeLanguage("es")} className="hover:scale-110 transition" aria-label="Español">🇪🇸</button>
+            <button onClick={() => changeLanguage("en")} className="hover:scale-110 transition" aria-label="Inglés">🇺🇸</button>
           </div>
 
           {status === "loading" ? (
@@ -41,7 +44,7 @@ export default function NavbarDark() {
               </span>
               <Image
                 src={session.user.image || "/default-avatar.png"}
-                alt="avatar"
+                alt={session.user.name || "avatar"}
                 width={36}
                 height={36}
                 className="rounded-full border"

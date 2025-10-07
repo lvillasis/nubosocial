@@ -1,21 +1,27 @@
 // components/Navbar.tsx
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
-import ThemeToggle from "@/components/ThemeToggle";
 import Logo from "@/components/LogoLogin";
 import { useState, useRef, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
+
+// ThemeToggle suele usar window/useTheme -> cargar solo en cliente
+const ThemeToggle = dynamic(() => import("@/components/ThemeToggle"), { ssr: false });
 
 export default function Navbar() {
   const { data: session, status } = useSession();
   const { t } = useTranslation("common");
   const router = useRouter();
 
+  // Cambiar idioma: espera router.isReady para evitar problemas en SSR/PRERENDER
   const changeLanguage = (lng: string) => {
-    router.push(router.pathname, router.asPath, { locale: lng });
+    if (!router?.isReady) return; // evita ejecutar antes de tiempo
+    // Mantener la misma ruta/consulta y solo cambiar locale
+    router.push(router.asPath, undefined, { locale: lng });
   };
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -32,8 +38,10 @@ export default function Navbar() {
     }
   };
 
-  // Cerrar menú de usuario al hacer click fuera
+  // Cerrar menú de usuario al hacer click fuera (protegido para cliente)
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     function onDocClick(e: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setUserMenuOpen(false);

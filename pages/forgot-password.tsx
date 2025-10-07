@@ -45,3 +45,5 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
+
+export const getServerSideProps = async () => ({ props: {} });
