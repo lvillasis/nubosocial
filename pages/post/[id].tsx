@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { triggerLikeExplosion } from "@/utils/likeAnimation";
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations"; // <-- AÑADIDO
+import type { GetServerSidePropsContext } from "next"; // opcional pero útil
 import UserSidebarCard from "@/components/UserSidebarCard";
 import RightSidebar from "@/components/RightSidebar";
 
@@ -223,8 +225,7 @@ export default function PostDetail() {
   );
 }
 
-// ✅ Evita el error "NextRouter was not mounted" y mantiene i18n
-export async function getServerSideProps({ locale }: any) {
+export async function getServerSideProps({ locale }: GetServerSidePropsContext) {
   return {
     props: {
       ...(await serverSideTranslations(locale ?? "es", ["common"])),

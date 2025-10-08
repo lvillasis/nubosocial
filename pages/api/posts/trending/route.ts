@@ -1,9 +1,15 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"; // o import prisma from "@/lib/prisma" si lo exportas por defecto
+// pages/api/posts/trending/route.ts
+import type { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@/lib/prisma"; // si tu export es named: "import { prisma } from '@/lib/prisma'"
 
 const contentHashtagRegex = /#(\w+)/g;
 
-export async function GET() {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
   try {
     const posts = await prisma.post.findMany({
       select: { hashtags: true, content: true },
@@ -36,17 +42,11 @@ export async function GET() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
-    return NextResponse.json(trends, {
-      headers: { "Cache-Control": "s-maxage=60, stale-while-revalidate=300" },
-    });
+    // Cache-Control igual que tu versión App Router
+    res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+    return res.status(200).json(trends);
   } catch (err) {
-    console.error("Error trending (route.ts):", err);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    console.error("Error trending (pages API):", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 }
-
-// ✅ Esto agrega compatibilidad para builds que esperan un export default
-export default { GET };
