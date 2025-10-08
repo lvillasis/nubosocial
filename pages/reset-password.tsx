@@ -63,4 +63,6 @@ export default function ResetPasswordPage() {
   );
 }
 
-export const getServerSideProps = async () => ({ props: {} });
+export async function getServerSideProps() {
+  return { props: {} };
+}

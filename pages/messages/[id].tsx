@@ -42,4 +42,6 @@ export default function ConversationPage() {
   );
 }
 
-export const getServerSideProps = async () => ({ props: {} });
+export async function getServerSideProps() {
+  return { props: {} };
+}

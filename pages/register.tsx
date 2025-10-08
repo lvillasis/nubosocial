@@ -165,4 +165,4 @@ export default function RegisterPage() {
 // Evita SSG/prerender en esta página: usar SSR para que el router esté disponible en cliente.
 export async function getServerSideProps() {
   return { props: {} };
-}
+} 

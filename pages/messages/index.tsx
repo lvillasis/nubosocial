@@ -571,3 +571,7 @@ function ComposeModal({ onClose, onSelectUser }: { onClose: () => void; onSelect
     </div>
   );
 }
+
+export async function getServerSideProps() {
+  return { props: {} };
+}
