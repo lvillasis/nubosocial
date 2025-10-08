@@ -48,7 +48,6 @@ export default function PostDetail() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId }),
-        
       });
 
       if (res.ok) {
@@ -58,7 +57,6 @@ export default function PostDetail() {
           triggerLikeExplosion(postId);
         }
 
-        // 🔹 Actualizamos solo el post actual
         setPost((prev: any) => ({
           ...prev,
           likesCount: data.likesCount,
@@ -87,7 +85,6 @@ export default function PostDetail() {
       });
       const newComment = await res.json();
 
-      // 🔹 Añadir nuevo comentario al inicio
       setPost((prev: any) =>
         prev ? { ...prev, comments: [newComment, ...prev.comments] } : prev
       );
@@ -106,14 +103,14 @@ export default function PostDetail() {
         <>
           {/* Sidebar Izquierdo */}
           <aside className="hidden lg:block w-64 sticky top-6 self-start h-fit bg-white dark:bg-gray-900 text-black dark:text-white rounded-2xl shadow-xl p-4 border border-gray-300 dark:border-gray-700 transition-colors">
-           <UserSidebarCard
-            user={{
-              id: session.user.id ?? "", // ✅ fallback a string vacío
-              name: session.user.name || "Sin nombre",
-              username: (session.user as any)?.username || "sin-usuario",
-              image: session.user.image || "/default-avatar.png",
-            }}
-          />
+            <UserSidebarCard
+              user={{
+                id: session.user.id ?? "",
+                name: session.user.name || "Sin nombre",
+                username: (session.user as any)?.username || "sin-usuario",
+                image: session.user.image || "/default-avatar.png",
+              }}
+            />
           </aside>
 
           {/* Columna central */}
@@ -133,7 +130,9 @@ export default function PostDetail() {
               </div>
 
               {/* Contenido */}
-              <p className="text-xl leading-relaxed whitespace-pre-line">{post.content}</p>
+              <p className="text-xl leading-relaxed whitespace-pre-line">
+                {post.content}
+              </p>
               {post.image && (
                 <img
                   src={post.image}
@@ -220,4 +219,13 @@ export default function PostDetail() {
       )}
     </div>
   );
+}
+
+// ✅ Evita el error "NextRouter was not mounted" y mantiene i18n
+export async function getServerSideProps({ locale }: any) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? "es", ["common"])),
+    },
+  };
 }
