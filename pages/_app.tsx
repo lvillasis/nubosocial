@@ -22,4 +22,4 @@ function MyApp({ Component, pageProps: { session, ...pageProps }, router }: AppP
   );
 }
 
-export default appWithTranslation(MyApp);
+export default MyApp;
