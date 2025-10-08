@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { appWithTranslation } from "next-i18next";
 import Layout from "@/components/Layout";
 import { ThemeProvider } from "next-themes";
+import "@/lib/i18n";
 
 function MyApp({ Component, pageProps: { session, ...pageProps }, router }: AppProps) {
   const noLayoutRoutes = ["/login", "/register"];

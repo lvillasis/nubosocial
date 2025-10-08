@@ -8,7 +8,7 @@ export async function cropImageToBase64(
   const image: HTMLImageElement = await new Promise((resolve, reject) => {
     const img = new window.Image();
     img.src = imageSrc;
-    img.crossOrigin = "anonymous"; // evitar problemas con CORS
+    img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
     img.onerror = reject;
   });

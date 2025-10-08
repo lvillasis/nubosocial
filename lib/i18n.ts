@@ -3,8 +3,24 @@ import { initReactI18next } from "react-i18next";
 
 i18n.use(initReactI18next).init({
   resources: {
-    es: { translation: { home: "Inicio", profile: "Perfil", news: "Noticias", signin: "Iniciar sesión", signout: "Salir" } },
-    en: { translation: { home: "Home", profile: "Profile", news: "News", signin: "Sign in", signout: "Sign out" } },
+    es: {
+      translation: {
+        home: "Inicio",
+        profile: "Perfil",
+        news: "Noticias",
+        signin: "Iniciar sesión",
+        signout: "Salir",
+      },
+    },
+    en: {
+      translation: {
+        home: "Home",
+        profile: "Profile",
+        news: "News",
+        signin: "Sign in",
+        signout: "Sign out",
+      },
+    },
   },
   lng: "es",
   fallbackLng: "es",
