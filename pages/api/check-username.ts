@@ -3,26 +3,33 @@ import { prisma } from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "GET") {
+    return res.status(405).json({ available: false, message: "Método no permitido" });
+  }
+
   try {
     const { username } = req.query;
 
-    if (typeof username !== "string" || username.trim().length < 3) {
+    if (typeof username !== "string" || username.trim() === "") {
       return res.status(400).json({ available: false, message: "Nombre inválido" });
     }
 
-    const normalizedUsername = username.trim().toLowerCase();
+    // Normaliza para evitar mayúsculas o espacios
+    const cleanUsername = username.trim().toLowerCase();
 
-    const exists = await prisma.user.findFirst({
-      where: { username: normalizedUsername },
+    // Busca el usuario exacto en la tabla "users"
+    const existingUser = await prisma.user.findFirst({
+      where: { username: cleanUsername },
+      select: { id: true },
     });
 
-    // Si no existe → disponible ✅
-    return res.status(200).json({ available: !exists });
+    if (existingUser) {
+      return res.status(200).json({ available: false, message: "El nombre de usuario ya está en uso" });
+    }
+
+    return res.status(200).json({ available: true, message: "Nombre disponible" });
   } catch (error) {
-    console.error("Error en /api/check-username:", error);
-    return res.status(500).json({
-      available: false,
-      message: "Error interno del servidor",
-    });
+    console.error("Error al verificar username:", error);
+    return res.status(500).json({ available: false, message: "Error interno del servidor" });
   }
 }
