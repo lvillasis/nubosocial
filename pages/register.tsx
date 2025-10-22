@@ -14,12 +14,8 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-export const dynamic = "force-dynamic"; // 🔧 Evita prerender (necesario para NextRouter)
-
 export default function RegisterPage() {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
 
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -31,7 +27,7 @@ export default function RegisterPage() {
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
 
-  // ✅ Manejo de imagen
+  // manejar imagen y previsualización
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (file) {
@@ -42,13 +38,14 @@ export default function RegisterPage() {
     }
   };
 
+  // limpiar preview al desmontar
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
     };
   }, [preview]);
 
-  // ✅ Verificación de disponibilidad de username (con debounce)
+  // verificación con debounce
   useEffect(() => {
     setUsernameAvailable(null);
     if (username.trim().length <= 2) {
@@ -60,7 +57,7 @@ export default function RegisterPage() {
     setIsCheckingUsername(true);
     const delayDebounce = setTimeout(() => {
       checkUsernameAvailability(username);
-    }, 400);
+    }, 500);
 
     return () => clearTimeout(delayDebounce);
   }, [username]);
@@ -77,7 +74,6 @@ export default function RegisterPage() {
     }
   };
 
-  // ✅ Validación de formulario
   const canSubmit = () => {
     if (loading) return false;
     if (username.trim().length < 3) return false;
@@ -86,7 +82,6 @@ export default function RegisterPage() {
     return true;
   };
 
-  // ✅ Envío del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit()) {
@@ -97,6 +92,7 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("username", username);
@@ -104,32 +100,24 @@ export default function RegisterPage() {
     formData.append("password", password);
     if (image) formData.append("image", image);
 
-    let res: Response;
     try {
-      res = await fetch("/api/register", {
+      const res = await fetch("/api/register", {
         method: "POST",
         body: formData,
       });
+
+      const data = await res.json();
+      setLoading(false);
+
+      if (res.ok) {
+        toast.success("🎉 Cuenta creada exitosamente en NuboSocial");
+        router.push("/login");
+      } else {
+        toast.error(data.message || "❌ Error al registrar");
+      }
     } catch {
       setLoading(false);
       toast.error("No se pudo conectar con el servidor. Intenta de nuevo.");
-      return;
-    }
-
-    let data;
-    try {
-      data = await res.json();
-    } catch {
-      data = { message: "Respuesta no válida del servidor" };
-    }
-
-    setLoading(false);
-
-    if (res.ok) {
-      toast.success("🎉 Cuenta creada exitosamente en NuboSocial");
-      if (mounted) router.push("/login");
-    } else {
-      toast.error(data.message || "❌ Error al registrar");
     }
   };
 
@@ -149,129 +137,150 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* FORMULARIO */}
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Imagen de perfil */}
-          <div className="flex flex-col items-center gap-3">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-slate-700 overflow-hidden flex items-center justify-center">
-                {preview ? (
-                  <Image
-                    src={preview}
-                    alt="Preview"
-                    width={96}
-                    height={96}
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <FaUser className="text-slate-400 text-4xl" />
-                )}
-              </div>
-              <label
-                htmlFor="image"
-                className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600"
-              >
-                <FaCamera />
-                <input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Avatar */}
+          <div className="flex items-center gap-4">
+            <label htmlFor="image" className="relative cursor-pointer">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-white/10 bg-white/10 flex items-center justify-center">
+                <Image
+                  src={preview || "/default-avatar.png"}
+                  alt="Avatar de usuario"
+                  width={80}
+                  height={80}
+                  className="object-cover"
                 />
-              </label>
-            </div>
-            <p className="text-sm text-slate-300">Sube una foto de perfil (opcional)</p>
+              </div>
+              <div className="absolute -bottom-1 -right-1 bg-blue-600 text-white p-2 rounded-full shadow z-10 border-2 border-white/20">
+                <FaCamera size={14} />
+              </div>
+            </label>
+            <input type="file" id="image" accept="image/*" onChange={handleImageChange} className="hidden" />
+            <div className="text-sm text-slate-200/80">Foto opcional (máx. 3MB)</div>
           </div>
 
           {/* Nombre */}
-          <div>
-            <label className="flex items-center gap-2 text-slate-200 font-medium">
+          <label className="block">
+            <div className="mb-1 text-sm font-medium text-slate-200 flex items-center gap-2">
               <FaUser /> Nombre completo
-            </label>
+            </div>
             <input
               type="text"
+              placeholder="Ej. Ana Pérez"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full mt-1 px-4 py-2 rounded-lg bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Tu nombre"
               required
+              className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-          </div>
+          </label>
 
           {/* Username */}
-          <div>
-            <label className="flex items-center gap-2 text-slate-200 font-medium">
+          <label className="block">
+            <div className="mb-1 text-sm font-medium text-slate-200 flex items-center gap-2">
               <FaAt /> Nombre de usuario
-            </label>
+            </div>
             <div className="relative">
               <input
                 type="text"
+                placeholder="Ej. ana_perez"
                 value={username}
-                onChange={(e) => setUsername(e.target.value.toLowerCase())}
-                className="w-full mt-1 px-4 py-2 rounded-lg bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                placeholder="ejemplo: nubo_user"
+                onChange={(e) => setUsername(e.target.value)}
                 required
+                className={`w-full p-3 pr-28 rounded-lg bg-white/10 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                  usernameAvailable === null
+                    ? "border border-white/20"
+                    : usernameAvailable
+                    ? "border border-green-500"
+                    : "border border-red-500"
+                }`}
+                minLength={3}
               />
-              <div className="absolute right-3 top-3">
-                {isCheckingUsername && (
-                  <FaSpinner className="animate-spin text-slate-400" />
-                )}
-                {!isCheckingUsername && usernameAvailable === true && (
-                  <FaCheckCircle className="text-green-400" />
-                )}
-                {!isCheckingUsername && usernameAvailable === false && (
-                  <FaTimesCircle className="text-red-400" />
-                )}
+              <div className="absolute inset-y-0 right-2 flex items-center">
+                {isCheckingUsername ? (
+                  <FaSpinner className="w-5 h-5 animate-spin text-slate-200" />
+                ) : usernameAvailable === true ? (
+                  <FaCheckCircle className="w-5 h-5 text-green-400" />
+                ) : usernameAvailable === false ? (
+                  <FaTimesCircle className="w-5 h-5 text-red-400" />
+                ) : null}
               </div>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
-              Debe tener al menos 3 caracteres y ser único.
+            <p
+              className={`mt-1 text-sm ${
+                username.trim().length <= 2
+                  ? "text-slate-200/70"
+                  : usernameAvailable
+                  ? "text-green-400"
+                  : usernameAvailable === false
+                  ? "text-red-400"
+                  : "text-slate-200/70"
+              }`}
+            >
+              {username.trim().length <= 2
+                ? "Ingresa al menos 3 caracteres para verificar."
+                : isCheckingUsername
+                ? "Verificando disponibilidad..."
+                : usernameAvailable === null
+                ? "Verificación no disponible"
+                : usernameAvailable
+                ? "¡Nombre de usuario disponible!"
+                : "Nombre de usuario en uso"}
             </p>
-          </div>
+          </label>
 
           {/* Email */}
-          <div>
-            <label className="flex items-center gap-2 text-slate-200 font-medium">
+          <label className="block">
+            <div className="mb-1 text-sm font-medium text-slate-200 flex items-center gap-2">
               <FaAt /> Correo electrónico
-            </label>
+            </div>
             <input
               type="email"
+              placeholder="tucorreo@ejemplo.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-1 px-4 py-2 rounded-lg bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="tucorreo@nubo.com"
               required
+              className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-          </div>
+          </label>
 
           {/* Contraseña */}
-          <div>
-            <label className="flex items-center gap-2 text-slate-200 font-medium">
+          <label className="block">
+            <div className="mb-1 text-sm font-medium text-slate-200 flex items-center gap-2">
               <FaLock /> Contraseña
-            </label>
+            </div>
             <input
               type="password"
+              placeholder="Mínimo 6 caracteres"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-1 px-4 py-2 rounded-lg bg-slate-800/50 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              placeholder="Mínimo 6 caracteres"
               required
+              minLength={6}
+              className="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-          </div>
+            <p className="mt-1 text-xs text-slate-200/70">
+              Usa una contraseña segura para proteger tu cuenta.
+            </p>
+          </label>
 
           {/* Botón */}
-          <button
-            type="submit"
-            disabled={!canSubmit()}
-            className={`w-full py-3 rounded-lg font-bold transition ${
-              canSubmit()
-                ? "bg-blue-500 hover:bg-blue-600 text-white"
-                : "bg-slate-700 text-slate-400 cursor-not-allowed"
-            }`}
-          >
-            {loading ? "Creando cuenta..." : "Crear cuenta"}
-          </button>
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={!canSubmit()}
+              className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition ${
+                canSubmit()
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-slate-400 cursor-not-allowed text-slate-200"
+              }`}
+            >
+              {loading ? (
+                <>
+                  <FaSpinner className="animate-spin" /> Creando cuenta...
+                </>
+              ) : (
+                "Crear cuenta"
+              )}
+            </button>
+          </div>
         </form>
 
         <p className="text-center text-sm text-slate-200/80 mt-5">
@@ -283,9 +292,4 @@ export default function RegisterPage() {
       </div>
     </div>
   );
-}
-
-// SSR vacío para evitar errores de prerender con router
-export async function getServerSideProps() {
-  return { props: {} };
 }
