@@ -1,14 +1,16 @@
-cat > fly.toml << 'EOF'
 app = "nombre-backend"
 
 [build]
-  # Usaremos Dockerfile local
-  image = "node:18-slim"
+  dockerfile = "Dockerfile"
 
 [env]
-  PORT = "8080"
+  PORT = "3000"
   NODE_ENV = "production"
 
-[deploy]
-  release_command = "npx prisma migrate deploy || true"
-EOF
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
