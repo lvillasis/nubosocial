@@ -3,22 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { username } = req.query;
-
-  if (typeof username !== "string" || username.trim() === "") {
-    return res.status(400).json({ available: false, message: "Nombre inválido" });
-  }
-
   try {
-    const exists = await prisma.user.findUnique({
-      where: { username: username.trim().toLowerCase() },
+    const { username } = req.query;
+
+    if (typeof username !== "string" || username.trim().length < 3) {
+      return res.status(400).json({ available: false, message: "Nombre inválido" });
+    }
+
+    const normalizedUsername = username.trim().toLowerCase();
+
+    const exists = await prisma.user.findFirst({
+      where: { username: normalizedUsername },
     });
 
+    // Si no existe → disponible ✅
     return res.status(200).json({ available: !exists });
   } catch (error) {
-    console.error("Error al verificar username:", error);
-    return res.status(500).json({ available: false, message: "Error del servidor" });
+    console.error("Error en /api/check-username:", error);
+    return res.status(500).json({
+      available: false,
+      message: "Error interno del servidor",
+    });
   }
 }
-
-
