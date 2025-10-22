@@ -1,0 +1,14 @@
+cat > fly.toml << 'EOF'
+app = "nombre-backend"
+
+[build]
+  # Usaremos Dockerfile local
+  image = "node:18-slim"
+
+[env]
+  PORT = "8080"
+  NODE_ENV = "production"
+
+[deploy]
+  release_command = "npx prisma migrate deploy || true"
+EOF

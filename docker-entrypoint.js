@@ -1,28 +1,34 @@
-#!/usr/bin/env node
+cat > docker-entrypoint.js << 'EOF'
+const { spawnSync, spawn } = require("child_process");
 
-const { spawn } = require('node:child_process')
+function runSync(cmd, args = []) {
+  const res = spawnSync(cmd, args, { stdio: "inherit", shell: false });
+  if (res.status !== 0) {
+    console.warn(`${cmd} ${args.join(" ")} exited with ${res.status}`);
+  }
+}
 
-const env = { ...process.env }
+(async () => {
+  try {
+    console.log("Running prisma generate...");
+    runSync("npx", ["prisma", "generate"]);
 
-;(async() => {
-  // If running the web server then prerender pages
-  if (process.argv.slice(-3).join(' ') === 'npm run start') {
-    await exec('npx next build --experimental-build-mode generate')
+    console.log("Running prisma migrate deploy...");
+    runSync("npx", ["prisma", "migrate", "deploy"]);
+  } catch (e) {
+    console.error("Error during startup tasks:", e);
   }
 
-  // launch application
-  await exec(process.argv.slice(2).join(' '))
-})()
+  console.log("Starting app...");
+  const child = spawn("npm", ["run", "start"], { stdio: "inherit" });
 
-function exec(command) {
-  const child = spawn(command, { shell: true, stdio: 'inherit', env })
-  return new Promise((resolve, reject) => {
-    child.on('exit', code => {
-      if (code === 0) {
-        resolve()
-      } else {
-        reject(new Error(`${command} failed rc=${code}`))
-      }
-    })
-  })
-}
+  process.on("SIGINT", () => {
+    child.kill("SIGINT");
+    process.exit(0);
+  });
+  process.on("SIGTERM", () => {
+    child.kill("SIGTERM");
+    process.exit(0);
+  });
+})();
+EOF

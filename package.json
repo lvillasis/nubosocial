@@ -8,7 +8,9 @@
     "start": "next start -p ${PORT:-3000} -H 0.0.0.0",
     "lint": "next lint",
     "dev:socket": "node server-socket.js",
-    "prebuild": "rimraf .next"
+    "start:socket": "node server-socket.js",
+    "prebuild": "rimraf .next",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -55,7 +57,10 @@
     "socket.io-client": "^4.8.1",
     "swr": "^2.3.6",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.1.9"
+    "zod": "^4.1.9",
+    "express": "^4.18.2",
+    "socket.io": "^4.8.1",
+    "@socket.io/redis-adapter": "^7.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -80,6 +85,6 @@
     "typescript": "^5.9.3"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   }
 }
