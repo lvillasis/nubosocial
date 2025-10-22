@@ -1,4 +1,3 @@
-# Dockerfile (recomendado)
 ARG NODE_VERSION=18
 FROM node:${NODE_VERSION}-slim AS base
 
@@ -28,9 +27,6 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives
 
 COPY --from=build /app /app
-
-# Ejecutar entrypoint con node
-ENTRYPOINT ["node", "/app/docker-entrypoint.js"]
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]

@@ -1,8 +1,10 @@
-cat > docker-entrypoint.js << 'EOF'
+#!/usr/bin/env node
+// docker-entrypoint.js
 const { spawnSync, spawn } = require("child_process");
 
 function runSync(cmd, args = []) {
-  const res = spawnSync(cmd, args, { stdio: "inherit", shell: false });
+  // use shell:true para mayor compatibilidad en contenedores
+  const res = spawnSync(cmd, args, { stdio: "inherit", shell: true });
   if (res.status !== 0) {
     console.warn(`${cmd} ${args.join(" ")} exited with ${res.status}`);
   }
@@ -14,21 +16,20 @@ function runSync(cmd, args = []) {
     runSync("npx", ["prisma", "generate"]);
 
     console.log("Running prisma migrate deploy...");
+    // deploy aplica migraciones en producción
     runSync("npx", ["prisma", "migrate", "deploy"]);
   } catch (e) {
     console.error("Error during startup tasks:", e);
   }
 
   console.log("Starting app...");
-  const child = spawn("npm", ["run", "start"], { stdio: "inherit" });
+  // Ejecuta el comando start (usa shell:true para resolver npm en PATH)
+  const child = spawn("npm", ["run", "start"], { stdio: "inherit", shell: true });
 
-  process.on("SIGINT", () => {
-    child.kill("SIGINT");
-    process.exit(0);
-  });
-  process.on("SIGTERM", () => {
-    child.kill("SIGTERM");
-    process.exit(0);
-  });
+  ["SIGINT", "SIGTERM"].forEach((sig) =>
+    process.on(sig, () => {
+      child.kill(sig);
+      process.exit(0);
+    })
+  );
 })();
-EOF
