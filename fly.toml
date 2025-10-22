@@ -1,4 +1,4 @@
-app = "nombre-backend"
+app = "nubosocial"
 
 [build]
   dockerfile = "Dockerfile"
