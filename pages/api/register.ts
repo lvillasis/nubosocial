@@ -1,10 +1,10 @@
 // /pages/api/register.ts
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
 import formidable from "formidable";
 import fs from "fs";
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export const config = {
   api: {
@@ -18,7 +18,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
 
-// 👇 Esta función envuelve formidable en una promesa para await
 const parseForm = (req: NextApiRequest): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   const form = formidable({ multiples: false });
   return new Promise((resolve, reject) => {
@@ -46,14 +45,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: "Faltan campos requeridos" });
     }
 
-    // 🔥 Normalizamos el username
     const username = rawUsername.trim().toLowerCase();
 
-    if (username === "") {
-      return res.status(400).json({ message: "El nombre de usuario no puede estar vacío" });
-    }
-
-    // ✅ Busca el usuario sin importar mayúsculas
     const existing = await prisma.user.findFirst({
       where: {
         username: {

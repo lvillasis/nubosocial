@@ -1,6 +1,6 @@
 // /pages/api/check-username.ts
-import { prisma } from "@/lib/prisma";
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@/lib/prisma";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
@@ -14,10 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ available: false, message: "Nombre inválido" });
     }
 
-    // 🔥 Normaliza el nombre antes de consultar
     const cleanUsername = username.trim().toLowerCase();
 
-    // Verifica en la base de datos con comparación insensible a mayúsculas
     const existingUser = await prisma.user.findFirst({
       where: {
         username: {
