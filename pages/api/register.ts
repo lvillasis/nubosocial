@@ -1,4 +1,4 @@
-// ✅ /pages/api/register.ts
+// /pages/api/register.ts
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
@@ -8,21 +8,18 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export const config = {
   api: {
-    bodyParser: false, // necesario para formidable
+    bodyParser: false,
   },
 };
 
-// 🔹 Configurar Cloudinary con tus variables .env
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
   api_key: process.env.CLOUDINARY_API_KEY!,
   api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
 
-// 🔹 Función helper para parsear formularios multipart/form-data
-const parseForm = (
-  req: NextApiRequest
-): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
+// 👇 Esta función envuelve formidable en una promesa para await
+const parseForm = (req: NextApiRequest): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
   const form = formidable({ multiples: false });
   return new Promise((resolve, reject) => {
     form.parse(req, (err, fields, files) => {
@@ -49,28 +46,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: "Faltan campos requeridos" });
     }
 
+    // 🔥 Normalizamos el username
     const username = rawUsername.trim().toLowerCase();
 
-    if (username.length < 3) {
-      return res.status(400).json({ message: "El nombre de usuario es demasiado corto" });
+    if (username === "") {
+      return res.status(400).json({ message: "El nombre de usuario no puede estar vacío" });
     }
 
-    // 🔹 Evita duplicados exactos
-    const existingUser = await prisma.user.findUnique({
-      where: { username },
-      select: { id: true },
+    // ✅ Busca el usuario sin importar mayúsculas
+    const existing = await prisma.user.findFirst({
+      where: {
+        username: {
+          equals: username,
+          mode: "insensitive",
+        },
+      },
     });
 
-    if (existingUser) {
+    if (existing) {
       return res.status(409).json({ message: "El nombre de usuario ya está en uso" });
     }
 
-    // 🔹 Encriptar contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
-
     let imageUrl = "/default-avatar.png";
 
-    // 🔹 Subir imagen si existe
     const imageFile = Array.isArray(files.image) ? files.image[0] : files.image;
     if (imageFile && fs.existsSync(imageFile.filepath)) {
       const upload = await cloudinary.uploader.upload(imageFile.filepath, {
@@ -79,7 +78,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       imageUrl = upload.secure_url;
     }
 
-    // 🔹 Crear usuario en base de datos
     await prisma.user.create({
       data: {
         name,
@@ -92,7 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({ message: "Usuario creado correctamente" });
   } catch (error) {
-    console.error("❌ Error en /api/register:", error);
+    console.error("Error en /api/register:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 }
