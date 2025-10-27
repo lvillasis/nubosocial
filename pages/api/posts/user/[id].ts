@@ -1,44 +1,23 @@
-// pages/api/posts/user/[id].ts
 import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const {
-    query: { id },
-    method,
-  } = req;
+  const { id } = req.query;
 
-  if (method !== "GET") {
-    return res.status(405).end(`Method ${method} Not Allowed`);
-  }
+  if (req.method !== "GET") return res.status(405).end(`Method ${req.method} Not Allowed`);
 
   try {
     const posts = await prisma.post.findMany({
-      where: {
-        authorId: String(id),
-      },
+      where: { authorId: String(id) },
       include: {
-        author: {
-          select: {
-            name: true,
-            image: true,
-            id: true,
-          },
-        },
+        author: { select: { id: true, name: true, username: true, image: true } },
         comments: {
-          include: {
-            author: {
-              select: { name: true },
-            },
-          },
+          include: { author: { select: { id: true, name: true, username: true, image: true } } },
         },
-        likes: {
-          select: { userId: true }, // 👈 relación correcta
-        },
+        likes: { include: { user: { select: { id: true, name: true, username: true, image: true } } } },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
+      take: 10, // los 10 más recientes, puedes agregar paginación
     });
 
     res.status(200).json({ posts });

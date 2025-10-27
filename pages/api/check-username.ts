@@ -1,4 +1,3 @@
-// /pages/api/check-username.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@/lib/prisma";
 
@@ -14,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ available: false, message: "Nombre inválido" });
     }
 
-    const cleanUsername = username.trim().toLowerCase();
+    const cleanUsername = username.trim();
 
     const existingUser = await prisma.user.findFirst({
       where: {
