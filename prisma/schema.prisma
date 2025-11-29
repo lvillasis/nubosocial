@@ -8,58 +8,40 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String
-  role          Role      @default(USER)
-  username      String    @unique
-  coverImage    String?
-  bio           String?
-  location      String?
-  isActive      Boolean   @default(true)
-
-  // Preferencias del usuario aquí
-  darkMode           Boolean @default(false)
-  language           String  @default("es")
-  emailNotifications Boolean @default(true)
-
-  accounts          Account[]
-  comments          Comment[]  @relation("UserComments")
-  likes             Like[]     @relation("UserLikes")
-  posts             Post[]     @relation("UserPosts")
-  sessions          Session[]
-  givenProfileLikes UserLike[] @relation("GivenProfileLikes")
-  profileLikes      UserLike[] @relation("ProfileLikes")
-
-  // relación inversa para HashtagFollow
-  hashtagFollows HashtagFollow[]
-
-  // relación inversa para FeedItem
-  feedItems FeedItem[]
-
-  // notificaciones recibidas (destinatario)
-  notifications Notification[] @relation("NotificationsReceived")
-
-  // notificaciones enviadas/creadas por este usuario (actor)
-  sentNotifications Notification[] @relation("NotificationsSent")
-
-  // relaciones añadidas para mensajes / conversaciones
+  id                       String                    @id @default(cuid())
+  name                     String
+  email                    String                    @unique
+  emailVerified            DateTime?
+  image                    String?
+  password                 String
+  role                     Role                      @default(USER)
+  username                 String                    @unique
+  coverImage               String?
+  bio                      String?
+  location                 String?
+  isActive                 Boolean                   @default(true)
+  darkMode                 Boolean                   @default(false)
+  language                 String                    @default("es")
+  emailNotifications       Boolean                   @default(true)
+  feedItems                FeedItem[]
+  hashtagFollows           HashtagFollow[]
+  accounts                 Account[]
+  comments                 Comment[]                 @relation("UserComments")
   conversationParticipants ConversationParticipant[]
-  sentMessages             Message[]
+  likes                    Like[]                    @relation("UserLikes")
   messageReads             MessageRead[]
-
-  // Relación inversa para RefreshToken (añadida)
-  refreshTokens RefreshToken[] @relation("UserRefreshTokens")
-
-  // Relación inversa para PasswordResetToken (añadida)
-  passwordResetTokens PasswordResetToken[] @relation("UserPasswordResetTokens")
+  sentMessages             Message[]
+  sentNotifications        Notification[]            @relation("NotificationsSent")
+  notifications            Notification[]            @relation("NotificationsReceived")
+  passwordResetTokens      PasswordResetToken[]      @relation("UserPasswordResetTokens")
+  posts                    Post[]                    @relation("UserPosts")
+  refreshTokens            RefreshToken[]            @relation("UserRefreshTokens")
+  sessions                 Session[]
+  givenProfileLikes        UserLike[]                @relation("GivenProfileLikes")
+  profileLikes             UserLike[]                @relation("ProfileLikes")
 
   @@map("users")
 }
-
 
 model Post {
   id        String     @id @default(cuid())
@@ -69,10 +51,10 @@ model Post {
   image     String?
   hashtags  String[]
   mentions  String[]
+  FeedItem  FeedItem[]
   comments  Comment[]  @relation("PostComments")
   likes     Like[]     @relation("PostLikes")
   author    User       @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
-  FeedItem  FeedItem[]
 
   @@map("posts")
 }
@@ -115,29 +97,18 @@ model UserLike {
   @@map("user_likes")
 }
 
-enum NotificationType {
-  LIKE
-  COMMENT
-  FOLLOW
-  MENTION
-  REPLY
-  MESSAGE
-}
-
 model Notification {
   id        String           @id @default(cuid())
-  userId    String // destinatario (quien recibe la notificación)
-  actorId   String // quien hizo la acción (por ejemplo, quien dio like)
+  userId    String
+  actorId   String
   type      NotificationType
-  postId    String? // opcional: relacionado a post
-  commentId String? // opcional: relacionado a comment
-  data      Json? // payload extra (p. ej. texto, snippet)
+  postId    String?
+  commentId String?
+  data      Json?
   read      Boolean          @default(false)
   createdAt DateTime         @default(now())
-
-  // relaciones nombradas explícitamente para evitar ambigüedad
-  user  User @relation("NotificationsReceived", fields: [userId], references: [id], onDelete: Cascade)
-  actor User @relation("NotificationsSent", fields: [actorId], references: [id], onDelete: Cascade)
+  actor     User             @relation("NotificationsSent", fields: [actorId], references: [id], onDelete: Cascade)
+  user      User             @relation("NotificationsReceived", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, read, createdAt])
   @@map("notifications")
@@ -179,9 +150,7 @@ model HashtagFollow {
   userId    String
   tag       String
   createdAt DateTime @default(now())
-
-  // relación al usuario
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, tag])
   @@index([tag])
@@ -194,8 +163,7 @@ model RefreshToken {
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
   expiresAt DateTime
-
-  user User @relation("UserRefreshTokens", fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserRefreshTokens", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("refresh_tokens")
@@ -214,36 +182,34 @@ model Conversation {
 }
 
 model ConversationParticipant {
-  id                String   @id @default(cuid())
+  id                String       @id @default(cuid())
   conversationId    String
   userId            String
-  joinedAt          DateTime @default(now())
+  joinedAt          DateTime     @default(now())
   lastReadMessageId String?
   lastReadAt        DateTime?
-
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([conversationId, userId])
   @@map("conversation_participants")
 }
 
 model Message {
-  id             String    @id @default(cuid())
+  id             String        @id @default(cuid())
   conversationId String
   senderId       String
   content        String?
-  attachment     String? // url / clave en Cloudinary
-  createdAt      DateTime  @default(now())
+  attachment     String?
+  createdAt      DateTime      @default(now())
   editedAt       DateTime?
-  deleted        Boolean   @default(false)
+  deleted        Boolean       @default(false)
   replyToId      String?
-
-  conversation Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  replyTo      Message?      @relation("MessageReplies", fields: [replyToId], references: [id])
-  replies      Message[]     @relation("MessageReplies")
-  reads        MessageRead[]
+  reads          MessageRead[]
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  replyTo        Message?      @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies        Message[]     @relation("MessageReplies")
+  sender         User          @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([conversationId, createdAt])
   @@map("messages")
@@ -254,9 +220,8 @@ model MessageRead {
   messageId String
   userId    String
   readAt    DateTime @default(now())
-
-  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([messageId, userId])
   @@map("message_reads")
@@ -267,9 +232,8 @@ model FeedItem {
   userId    String
   postId    String
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@index([postId])
@@ -282,13 +246,11 @@ model PasswordResetToken {
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
   expiresAt DateTime
-
-  user User @relation("UserPasswordResetTokens", fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation("UserPasswordResetTokens", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("password_reset_tokens")
 }
-
 
 model Session {
   id           String   @id @default(cuid())
@@ -307,6 +269,15 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  MENTION
+  REPLY
+  MESSAGE
 }
 
 enum Role {
